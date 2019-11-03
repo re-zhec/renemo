@@ -1,0 +1,13 @@
+# Compiled source #
+###################
+*.o
+*.d
+*.exe
+
+# Misc #
+########
+*.ttf
+
+# Folders #
+###########
+build/

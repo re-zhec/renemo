@@ -1,0 +1,22 @@
+////////////////////////////////////////////////////////////////////////////////
+/// \copyright MIT License                                                   ///
+/// \author    Caylen Lee                                                    ///
+/// \date      2019                                                          ///
+////////////////////////////////////////////////////////////////////////////////
+#include "GameObject/OverworldCharacter/OverworldCharacterPhysics.hpp"
+#include "GameObject/GameObject.hpp"
+
+namespace nemo
+{
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+void
+OverworldCharacterPhysics::updateObjectInteraction(GameObject& obj)
+const
+{
+	obj.goToNewPosition();
+}
+
+} // namespace nemo

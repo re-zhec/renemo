@@ -1,0 +1,20 @@
+{
+	"configurations": [
+		{
+			"name": "Win32",
+			"includePath": [
+				"${workspaceFolder}/engine/include",
+				"${workspaceFolder}/engine/type_safe/include",
+				"${workspaceFolder}/engine/json/single_include",
+				"C:/SFML/include",
+				"C:/MinGW/include/c++/8.2.0",
+				"C:/MinGW/include"
+			],
+			"compilerPath": "C:/MinGW/bin/g++",
+			"cStandard": "c11",
+			"cppStandard": "c++17",
+			"intelliSenseMode": "${default}"
+		}
+	],
+	"version": 4
+}
