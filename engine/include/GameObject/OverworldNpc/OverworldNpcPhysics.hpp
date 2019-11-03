@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "GameObject/GameObjectGraphics.hpp"
+#include "GameObject/GameObjectPhysics.hpp"
 
 namespace nemo
 {
@@ -13,11 +13,11 @@ namespace nemo
 /**
  * \brief 
  */
-class OverworldCharacterGraphics : public GameObjectGraphics
+class OverworldNpcPhysics : public GameObjectPhysics
 {
 public:
 	virtual void
-	updateObjectDisplay(GameObject& obj, sf::RenderWindow& window)
+	updateObjectInteraction(GameObject& obj)
 	const override;
 
 private:

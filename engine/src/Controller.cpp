@@ -3,6 +3,14 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * \todo Replace \a fields_to_buttons_ and reimplement \link 
+ * nemo::Controller::isValidKeyCode with Neargye's magic_enum 
+ * (https://github.com/Neargye/magic_enum) when MinGW comes with GCC 9.0+ 
+ * install.
+ */
+
 #include <fstream>
 #include <iomanip>
 #include <string>
@@ -24,24 +32,25 @@ namespace nemo
 
 namespace
 {
-	using labels_to_controller_t = boost::bimap< 
+	using fields_to_controller_t = boost::bimap< 
 		boost::bimaps::unordered_set_of< std::string >, 
 		boost::bimaps::unordered_set_of< Button >,
 		boost::bimaps::list_of_relation
 	>;
 	
 	// Mapping JSON property names to their respective controller buttons.
-	const static labels_to_controller_t fields_to_buttons_ 
-		= boost::assign::list_of< labels_to_controller_t::relation >
+	const static fields_to_controller_t fields_to_buttons_ 
+		= boost::assign::list_of< fields_to_controller_t::relation >
 		( "left"  , Button::Left   )
 		( "up"    , Button::Up     )
 		( "right" , Button::Right  )
 		( "down"  , Button::Down   )
 		( "cancel", Button::Cancel )
-		( "select", Button::Select );
+		( "select", Button::Select )
+		( "pause" , Button::Pause  );
 
 	// Directory to hold all controller configuration files.
-	const boost::filesystem::path controller_dir("controller");
+	const boost::filesystem::path controller_dir("data/controller");
 }
 
 std::vector< sf::Keyboard::Key >
@@ -146,7 +155,7 @@ Controller::useDefaultKeyMappings()
 void
 Controller::registerKeyPress(const sf::Keyboard::Key key)
 {
-	if (!isKeyValid(key)) {
+	if (!isValidKeyCode(key)) {
 		return;
 	}
 
@@ -168,7 +177,7 @@ Controller::registerKeyPress(const sf::Keyboard::Key key)
 void
 Controller::registerKeyRelease(const sf::Keyboard::Key key)
 {
-	if (!isKeyValid(key)) {
+	if (!isValidKeyCode(key)) {
 		return;
 	}
 
@@ -250,11 +259,13 @@ const
 ////////////////////////////////////////////////////////////////////////////////
 
 bool
-Controller::changeKeyMapping(const sf::Keyboard::Key key, const Button button)
+Controller::changeKeyMapping(const int keycode, const Button button)
 {
-	if (!isKeyValid(key)) {
-		throw std::out_of_range("Invalid key " + std::to_string(key));
+	if (!isValidKeyCode(keycode)) {
+		throw std::out_of_range("Invalid key " + std::to_string(keycode));
 	}
+
+	const sf::Keyboard::Key key = static_cast< sf::Keyboard::Key>(keycode);
 
 	// Delete whatever the button and key were previously mapped to. A key 
 	// cannot be mapped to multiple buttons, and vice versa.
@@ -286,6 +297,11 @@ const
 	nlohmann::json config;
 
 	for (const auto& [key, button] : _key_mappings.right) {
+		assert(
+			fields_to_buttons_.right.find(button) !=
+			fields_to_buttons_.right.end()
+		);
+
 		// Get the button's json property name.
 		const std::string button_field = fields_to_buttons_.right.at(button);
 		config[button_field] = key;
@@ -300,13 +316,11 @@ const
 ////////////////////////////////////////////////////////////////////////////////
 
 bool
-Controller::isKeyValid(const sf::Keyboard::Key key)
+Controller::isValidKeyCode(const int keycode)
 noexcept
-{
-	const int key_code = static_cast<int>(key);
-	
-	return key > static_cast< decltype(key_code) >(sf::Keyboard::Unknown) &&
-		key <= static_cast< decltype(key_code) >(sf::Keyboard::Enter);
+{	
+	return keycode > static_cast< int >(sf::Keyboard::Unknown) &&
+		keycode <= static_cast< int >(sf::Keyboard::Enter);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

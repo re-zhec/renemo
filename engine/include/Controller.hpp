@@ -94,17 +94,17 @@ public:
 	/**
 	 * \brief Change the key that a controller button is be mapped to.
 	 * 
-	 * \param key    Key to map.
+	 * \param key    Code number of the key to map.
 	 * \param button Button that key will be mapped to.
 	 * 
 	 * \return False if any controller button is unmapped after this change, true 
 	 * otherwise.
 	 * 
-	 * \throw std::out_of_range if \a key is not within \ref sf::Keyboard::Key 
+	 * \throw std::out_of_range if \a key is not within \link sf::Keyboard::Key 
 	 * enum range. No mapping change happens in this case.
 	 */
 	bool
-	changeKeyMapping(const sf::Keyboard::Key key, const Button button);
+	changeKeyMapping(const int key, const Button button);
 
 	/**
 	 * \brief Saves current key mappings for use on future game sessions.
@@ -138,15 +138,15 @@ private:
 	useDefaultKeyMappings();
 
 	/**
-	 * \brief Checks if this key code is an acceptable \ref sf::Keyboard::Key 
+	 * \brief Checks if this code number is a valid \link sf::Keyboard::Key enum
 	 * value.
 	 * 
-	 * \param key Key code in question.
+	 * \param keycode Code number.
 	 * 
 	 * \return True if yes, false otherwise.
 	 */
 	static bool
-	isKeyValid(const sf::Keyboard::Key key)
+	isValidKeyCode(const int key)
 	noexcept;
 
 	// Type alias

@@ -8,9 +8,10 @@
 #include <memory>
 
 #include "GameObject.hpp"
-#include "OverworldCharacter/OverworldCharacterInput.hpp"
-#include "OverworldCharacter/OverworldCharacterPhysics.hpp"
-#include "OverworldCharacter/OverworldCharacterGraphics.hpp"
+#include "OverworldNpc/OverworldPlayerInput.hpp"
+#include "OverworldNpc/OverworldNpcInput.hpp"
+#include "OverworldNpc/OverworldNpcPhysics.hpp"
+#include "OverworldNpc/OverworldNpcGraphics.hpp"
 
 namespace nemo
 {
@@ -24,7 +25,13 @@ public:
 	 * \return A character on the overworld map.
 	 */
 	static std::unique_ptr< GameObject >
-	overworldCharacter();
+	overworldNpc();
+
+	/**
+	 * \return A playable character on the overworld map.
+	 */
+	static std::unique_ptr< GameObject >
+	overworldPlayer();
 };
 
 } // namespace nemo

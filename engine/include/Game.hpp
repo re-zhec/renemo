@@ -58,6 +58,7 @@ private:
 	bool _is_playing;
 
 	std::unique_ptr< GameObject > _player;
+	std::unique_ptr< GameObject > _npc;
 };
 
 } // namespace nemo

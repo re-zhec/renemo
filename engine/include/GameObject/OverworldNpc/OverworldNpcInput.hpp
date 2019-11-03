@@ -5,10 +5,32 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <iostream>
-#include <cassert>
+#include "GameObject/GameObjectInput.hpp"
 
-#define MESSAGE(m) __FILE__ << ":" << __LINE__ << ":" << __func__ << ": " << m
-#define STDINFO(m) (std::cout << "INFO: " << MESSAGE(m) << std::endl)
-#define STDERR(m)  (std::cerr << "ERROR: " << MESSAGE(m) << std::endl)
-#define STDWARN(m) (std::cerr << "WARNING: " << MESSAGE(m) << std::endl)
+namespace nemo
+{
+
+/**
+ * \brief 
+ */
+class OverworldNpcInput : public GameObjectInput
+{
+public:
+	/**
+	 * \brief
+	 */
+	OverworldNpcInput();
+
+	/**
+	 * \brief Controls player action on the overworld map.
+	 */
+	virtual void
+	updateObjectAction(GameObject& obj)
+	const override;
+
+private:
+	/// NPC's moving speed.
+	constexpr static float _moving_speed = 2.0f;
+};
+
+}

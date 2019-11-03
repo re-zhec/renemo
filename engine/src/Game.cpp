@@ -15,7 +15,8 @@ namespace nemo
 
 Game::Game()
 	: _is_playing(true)
-	, _player(GameObjectCreator::overworldCharacter())
+	, _player(GameObjectCreator::overworldNpc())
+	, _npc(GameObjectCreator::overworldPlayer())
 {
 }
 
@@ -62,6 +63,7 @@ Game::updateFrame(sf::RenderWindow& window)
 	}
 
 	_player->updateObject(window);
+	_npc->updateObject(window);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

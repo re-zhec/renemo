@@ -3,7 +3,7 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-#include "GameObject/OverworldCharacter/OverworldCharacterPhysics.hpp"
+#include "GameObject/OverworldNpc/OverworldNpcGraphics.hpp"
 #include "GameObject/GameObject.hpp"
 
 namespace nemo
@@ -13,10 +13,15 @@ namespace nemo
 ////////////////////////////////////////////////////////////////////////////////
 
 void
-OverworldCharacterPhysics::updateObjectInteraction(GameObject& obj)
-const
+OverworldNpcGraphics::updateObjectDisplay(
+	GameObject&       obj,
+	sf::RenderWindow& window
+) const
 {
-	obj.goToNewPosition();
+	obj.drawOnWindow(window);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 } // namespace nemo
