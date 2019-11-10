@@ -3,110 +3,85 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-#include <algorithm>
-#include <utility>
-#include <SFML/Graphics/Color.hpp>
+#include "type/Vector2.hpp"
 
-#include "GameObject/GameObject.hpp"
-#include "GameObject/GameObjectInput.hpp"
-#include "GameObject/GameObjectPhysics.hpp"
-#include "GameObject/GameObjectGraphics.hpp"
-
-namespace nemo
+namespace nemo::type
 {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-GameObject::GameObject(
-	std::unique_ptr< GameObjectInput >&&    input,
-	std::unique_ptr< GameObjectPhysics >&&  physics,
-	std::unique_ptr< GameObjectGraphics >&& graphics
-)
-	: _input(std::move(input))
-	, _physics(std::move(physics))
-	, _graphics(std::move(graphics))
+Vector2::Vector2(x_t x, y_t y)
+noexcept
+	: _x(x), _y(y) 
 {
-	_hitbox.setFillColor(sf::Color::Red);
-	_hitbox.setSize({ 100.f, 100.f });
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void
-GameObject::stopMoving()
+Vector2 
+Vector2::operator + (const Vector2 rhs)
+const noexcept
 {
-	_velocity = { 0, 0 };
+	return Vector2(_x + rhs._x, _y + rhs._y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void
-GameObject::setToGoLeft(const float x)
+Vector2&
+Vector2::operator += (const Vector2 rhs) 
+noexcept
 {
-	_velocity = { -x, 0 };
+	_x += rhs._x;
+	_y += rhs._y;
+	return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void
-GameObject::setToGoUp(const float y)
+Vector2 
+Vector2::operator - (const Vector2 rhs)
+const noexcept 
 {
-	_velocity = { 0, -y };
+	return { _x - rhs._x, _y - rhs._y };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void
-GameObject::setToGoRight(const float x)
+Vector2&
+Vector2::operator -= (const Vector2 rhs)
+noexcept
 {
-	_velocity = { x, 0 };
+	_x -= rhs._x;
+	_y -= rhs._y;
+	return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void
-GameObject::setToGoDown(const float y)
+template< typename T >
+sf::Vector2< T >
+Vector2::sfVector2()
+const noexcept
 {
-	_velocity = { 0, y };
+	namespace ts = type_safe::strong_typedef_op::detail;
+	const auto x = static_cast< decltype(ts::get_underlying(_x)) >(_x);
+	const auto y = static_cast< decltype(ts::get_underlying(_y)) >(_y);
+	return { static_cast< T >(x), static_cast< T >(y) };
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void
-GameObject::goToNewPosition()
-{
-	_hitbox.move(_velocity);
-}
+template sf::Vector2< int >   Vector2::sfVector2< int >()   const noexcept;
+template sf::Vector2< float > Vector2::sfVector2< float >() const noexcept;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void
-GameObject::drawOnWindow(sf::RenderWindow& window)
-const
-{
-	window.draw(_hitbox);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-void
-GameObject::updateObject(sf::RenderWindow& window)
-{
-	_input->updateObjectAction(*this);
-	_physics->updateObjectInteraction(*this);
-	_graphics->updateObjectDisplay(*this, window);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-} // namespace nemo
+} // namespace nemo::type

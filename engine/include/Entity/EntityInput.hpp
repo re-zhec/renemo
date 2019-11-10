@@ -3,20 +3,21 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-#include "GameObject/OverworldNpc/OverworldNpcPhysics.hpp"
-#include "GameObject/GameObject.hpp"
+#pragma once
 
 namespace nemo
 {
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+class Entity;
 
-void
-OverworldNpcPhysics::updateObjectInteraction(GameObject& obj)
-const
+class EntityInput
 {
-	obj.goToNewPosition();
-}
+public:
+	virtual ~EntityInput() = default;
+	
+	virtual void
+	updateObjectAction(Entity& obj)
+	const = 0;
+};
 
 } // namespace nemo

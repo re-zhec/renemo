@@ -5,22 +5,33 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "GameObject/GameObjectGraphics.hpp"
+#include "Entity.hpp"
+#include "Npc/PlayerInput.hpp"
+#include "Npc/NpcInput.hpp"
+#include "Npc/NpcPhysics.hpp"
+#include "Npc/NpcGraphics.hpp"
+
+#include <memory>
 
 namespace nemo
 {
 
-/**
- * \brief 
- */
-class OverworldNpcGraphics : public GameObjectGraphics
+class Entity;
+
+class EntityCreator
 {
 public:
-	virtual void
-	updateObjectDisplay(GameObject& obj, sf::RenderWindow& window)
-	const override;
+	/**
+	 * \return A character on the overworld map.
+	 */
+	static std::unique_ptr< Entity >
+	npc();
 
-private:
+	/**
+	 * \return A playable character on the overworld map.
+	 */
+	static std::unique_ptr< Entity >
+	player();
 };
 
 } // namespace nemo

@@ -1,0 +1,55 @@
+////////////////////////////////////////////////////////////////////////////////
+/// \copyright MIT License                                                   ///
+/// \author    Caylen Lee                                                    ///
+/// \date      2019                                                          ///
+////////////////////////////////////////////////////////////////////////////////
+#include "World/World.hpp"
+#include "World/Tileset.hpp"
+#include "World/Tile.hpp"
+#include "type/Vector2.hpp"
+
+#include <algorithm>
+
+namespace nemo
+{
+
+namespace {
+	using row_t    = type::x_t;
+	using column_t = type::y_t;
+}
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+void
+World::resetToSize(const type::Vector2 size)
+noexcept
+{
+	const auto [width, height] = size.sfVector2< int >();
+	_tiles = tile_array_t(boost::extents[width][height]);
+
+	for (auto t = _tiles.origin(); 
+		t != _tiles.origin() + _tiles.num_elements; ++t)
+	{
+		*t = std::make_unique< Tile >(row_t(0), column_t(0));
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+void
+World::setTileset(const TilesetType type)
+{
+	_tileset = makeTileset(type);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+void
+World::drawWorld(sf::RenderWindow& window)
+const
+{ 
+}
+
+} // namespace nemo

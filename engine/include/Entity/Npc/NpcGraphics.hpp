@@ -5,10 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <memory>
-
-#include "GameObject/GameObjectInput.hpp"
-#include "Controller.hpp"
+#include "Entity/EntityGraphics.hpp"
 
 namespace nemo
 {
@@ -16,27 +13,14 @@ namespace nemo
 /**
  * \brief 
  */
-class OverworldPlayerInput : public GameObjectInput
+class NpcGraphics : public EntityGraphics
 {
 public:
-	/**
-	 * \brief
-	 */
-	OverworldPlayerInput();
-
-	/**
-	 * \brief Controls player action on the overworld map.
-	 */
 	virtual void
-	updateObjectAction(GameObject& obj)
+	updateObjectDisplay(Entity& obj, sf::RenderWindow& window)
 	const override;
 
 private:
-	/// Player controller.
-	std::unique_ptr< Controller > _controller;
-
-	/// Player's moving speed.
-	constexpr static float _moving_speed = 2.0f;
 };
 
-}
+} // namespace nemo

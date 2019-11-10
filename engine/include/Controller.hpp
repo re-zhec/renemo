@@ -2,7 +2,6 @@
 /// \copyright MIT License                                                   ///
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
-/// \file      Controller.hpp                                                ///
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
@@ -19,11 +18,12 @@ namespace nemo
 {
 
 /**
- * \brief Enumeration for controller buttons.
+ * \brief
+ * Enumeration for controller buttons.
  */
 enum class Button
 {
-	Left = 0, 
+	Left, 
 	Up,
 	Right,
 	Down,
@@ -32,86 +32,228 @@ enum class Button
 	Pause
 };
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 /**
- * \brief Keyboard controller.
+ * \brief
+ * Keyboard controller.
  */
 class Controller
 {
 public:
 	/**
-	 * \brief Controller with default key mappings.
+	 * \brief
+	 * Constructs a controller that has default key mappings.
 	 */
 	Controller();
 
 	/**
-	 * \brief Controller with key mappings configured from a file.
+	 * \brief
+	 * Constructs a controller using keyboard mappings from a file.
 	 * 
-	 * \param file Path to file containing custom key mappings.
+	 * \param file
+	 * Path to the keyboard mapping file.
+	 * 
+	 * The keyboard mapping file is a json, where each property is a controller 
+	 * button and its value is an integer that identifies a keyboard key. This 
+	 * is an example of a valid key mapping json:
+	 * 
+	 * \code
+	 * {
+	 *     "down": 18,   // S key
+	 *     "left": 0,    // A key
+	 *     "right": 3,   // D key
+	 *     "up": 22,     // W key
+	 *     "cancel": 16, // Q key
+	 *     "pause": 53,  // Backslash key
+	 *     "select": 58  // Enter key
+	 * }
+	 * \endcode
+	 * 
+	 * All of the above properties must be used and have proper key code values. 
+	 * Otherwise, if any of them are missing, or if a value references a 
+	 * nonexistent key, or any parse or other file-reading errors occurred, then 
+	 * the controller will use the default keyboard mapping.
 	 */
 	Controller(const boost::filesystem::path& file);
 
 	/**
-	 * \brief Save controller's current key mappings to the optional file the 
-	 * controller was constructed with.
+	 * \brief
+	 * Destructor that optionally saves the controller's current key mappings to
+	 * a file.
+	 * 
+	 * When a controller that was constructed with a key mapping file is 
+	 * destructed, regardless whether the original configurations were 
+	 * successfully loaded or the default keyboard mapping had to be used, the 
+	 * destructor will overwrite or create the file with the controller's 
+	 * current keyboard mapping.
 	 */
 	virtual 
 	~Controller();
 
 	/**
-	 * \brief Signals to all controllers that a key is pressed.
+	 * \brief
+	 * Adds a keyboard key to a queue of currently pressed keys.
 	 * 
-	 * \param key Pressed key.
+	 * \param key
+	 * Pressed keyboard key.
+	 * 
+	 * All controller objects shared access to a single queue of currently 
+	 * pressed keys, which they will translate to controller buttons based on 
+	 * their individual keyboard mapping. A key added to this queue stays in it
+	 * until \link registerKeyRelease is called with the same key as the 
+	 * argument.
+	 * 
+	 * Usage-wise, this means that when a player presses a key, call \link 
+	 * registerKeyPress for that key, and once the player releases the key, call 
+	 * \link registerKeyRelease.
 	 */
 	static void
 	registerKeyPress(const sf::Keyboard::Key key);
 
 	/**
-	 * \brief Signals to all controllers that a key is released.
+	 * \brief
+	 * Removes a keyboard key from a queue of currently pressed keys.
 	 * 
-	 * \param key Released key.
+	 * \param key
+	 * Released key.
+	 * 
+	 * All controller objects shared access to a single queue of currently 
+	 * pressed keys, which they will translate to controller buttons based on 
+	 * their individual keyboard mapping. The only way to remove a keyboard key 
+	 * that has been added to the queue, particularly after the player releases 
+	 * the key, is to call this method. Otherwise, all controller objects will 
+	 * still think the released key is still being pressed.
 	 */
 	static void
 	registerKeyRelease(const sf::Keyboard::Key key);
 
 	/**
-	 * \brief Gets any directional button that is currently pressed.
+	 * \brief
+	 * Gets a currently pressed directional button.
 	 * 
-	 * \return Currently pressed directional button, if any.
+	 * Directional buttons consist of the left, up, right, and down button. This 
+	 * method will return one of them if its mapped keyboard key is pressed. 
+	 * If more than one of these buttons are currently pressed, then this method 
+	 * will return the most recently pressed one.
+	 * 
+	 * If no directional buttons are currently pressed, this method will return
+	 * a \link std::nullopt.
+	 * 
+	 * \return 
+	 * Currently pressed directional button, if any.
 	 */
 	std::optional< Button >
 	getPressedDirection()
 	const;
 
 	/**
-	 * \brief Gets any selectional button that is currently pressed.
+	 * \brief
+	 * Gets a currently pressed selection button.
 	 * 
-	 * \return Currently pressed selectional button, if any.
+	 * Selection buttons consist of the select, cancel, and pause button. This 
+	 * method will return one of them if its mapped keyboard key is pressed. 
+	 * If more than one of these buttons are currently pressed, then this method 
+	 * will return the most recently pressed one.
+	 * 
+	 * If no selection buttons are currently pressed, this method will return a 
+	 * \link std::nullopt.
+	 * 
+	 * \return 
+	 * Currently pressed selection button, if any.
 	 */
 	std::optional< Button >
 	getPressedSelection()
 	const;
+
+	/**
+	 * \brief 
+	 * Gets a currently pressed button.
+	 * 
+	 * \param button_filters
+	 * Buttons to limit the returned result to.
+	 * 
+	 * If \a button_filters is empty or not used, then this method will any 
+	 * controller button that is currently pressed. Otherwise, it will return 
+	 * one of the buttons in the filter list. This is a more customized button 
+	 * query than \link getPressedDirection and \link getPressedSelection.
+	 * 
+	 * If more than one of the requested buttons are currently pressed, then 
+	 * this method will return the most recently pressed one. If none of the 
+	 * requested buttons are currently pressed, this method will return a \link
+	 * std::nullopt.
+	 * 
+	 * \return
+	 * Currently pressed button among \a button_filters, if any.
+	 */
+	std::optional< Button >
+	getPressedButton(const std::vector< Button > button_filters = {})
+	const;
 	
 	/**
-	 * \brief Change the key that a controller button is be mapped to.
+	 * \brief
+	 * Changes the key that a controller button is mapped to.
 	 * 
-	 * \param key    Code number of the key to map.
-	 * \param button Button that key will be mapped to.
+	 * \param key       Code number of the key to map.
+	 * \param button    Button that key will be mapped to.
 	 * 
-	 * \return False if any controller button is unmapped after this change, true 
-	 * otherwise.
+	 * Each controller button is to be mapped to one unique keyboard key only. 
+	 * Likewise, one keyboard key cannot be mapped to multiple controller 
+	 * buttons. If \a key and \a button haven't been mapped before, then this 
+	 * method will simply create the new mapping. On the other hand, if \a key 
+	 * OR \a button are each already mapped to something else, those mappings 
+	 * will be removed to allow the new mapping between \a key and \a button.
 	 * 
-	 * \throw std::out_of_range if \a key is not within \link sf::Keyboard::Key 
-	 * enum range. No mapping change happens in this case.
+	 * Because of this behavior, it is possible to have a controller with 
+	 * unmapped buttons. \link isValidController should be called after 
+	 * changing the keyboard mapping to check whether any buttons are left 
+	 * unmapped.
+	 * 
+	 * \return
+	 * False \a key is not within \link sf::Keyboard::Key's enum range. The 
+	 * previous mapping is kept in this case.
 	 */
 	bool
 	changeKeyMapping(const int key, const Button button);
 
 	/**
-	 * \brief Saves current key mappings for use on future game sessions.
+	 * \brief
+	 * Check whether the current keyboard mapping is valid.
 	 * 
-	 * \param file Filepath to save current mappings to.
+	 * The keyboard mapping is valid if and only if each controller button is 
+	 * mapped to a unique keyboard key. It is not possible to have multiple 
+	 * keys mapped to one button and vice versa. This should be called after all
+	 * \link changKeyMapping.
 	 * 
-	 * \return True if save is successful, false otherwise.
+	 * \return
+	 * True if the keyboard mapping is valid, false otherwise.
+	 * 
+	 * \see
+	 * changeKeyMapping
+	 */
+	bool
+	isValidController()
+	const noexcept;
+
+	/**
+	 * \brief 
+	 * Saves current keyboard mappings to a file.
+	 * 
+	 * \param file
+	 * Filepath to save current mappings to.
+	 * 
+	 * This method will create, or overwrite the existing file with, a json 
+	 * file. If the file's parent path does not exist, the method will 
+	 * recursively create the directories that don't exist. If any of the 
+	 * nonexistent directories failed to be created, or if the method failed to 
+	 * create or overwrite the file, the returned value will be false.
+	 * 
+	 * \return
+	 * True if save is successful, false otherwise.
+	 * 
+	 * \see
+	 * Controller for the json contents.
 	 */
 	bool
 	saveKeyMappings(const boost::filesystem::path& file)
@@ -119,35 +261,48 @@ public:
 
 private:
 	/**
-	 * \brief Gets a button that is currently pressed among a list of allowed 
-	 * buttons.
+	 * \brief
+	 * Change current keyboard mappings to the default.
 	 * 
-	 * \param allowed_buttons List of buttons to check whether one is currently 
-	 * pressed.
-	 * 
-	 * \return Currently pressed button among that list, if any.
-	 */
-	std::optional< Button >
-	getPressedButton(const std::vector< Button > allowed_buttons)
-	const;
-
-	/**
-	 * \brief Change current key mappings to the default.
+	 * The default key => button mapping is the following:
+	 *     A     => Left
+	 *     W     => Up
+	 *     D     => Right
+	 *     S     => Down
+	 *     Q     => Cancel
+	 *     \     => Pause
+	 *     Enter => Select
 	 */
 	void
 	useDefaultKeyMappings();
 
 	/**
-	 * \brief Checks if this code number is a valid \link sf::Keyboard::Key enum
-	 * value.
+	 * \brief 
+	 * Checks if a key code is a valid \link sf::Keyboard::Key enum value.
 	 * 
-	 * \param keycode Code number.
+	 * \param keycode
+	 * Code number.
 	 * 
-	 * \return True if yes, false otherwise.
+	 * Keycodes are represented as integers in a keyboard mapping file. This 
+	 * method protects against numbers that are not within range of \link 
+	 * sf::Keybaord::Key's enumeration.
+	 * 
+	 * \return 
+	 * True if yes, false otherwise.
 	 */
 	static bool
-	isValidKeyCode(const int key)
+	isValidKeyCode(const int keycode)
 	noexcept;
+
+	/**
+	 * \brief
+	 * Get default path to a directory for keyboard mapping files.
+	 * 
+	 * \return
+	 * Absolute path to the keyboard mapping directory.
+	 */
+	static boost::filesystem::path
+	getControllerDir();
 
 	// Type alias
 	using keyboard_to_controller_t = boost::bimap< 
@@ -156,40 +311,63 @@ private:
 		boost::bimaps::list_of_relation
 	>;
 
-	/// Path to controller's configuration file.
+	/// Path to controller's keyboard mapping file.
 	boost::filesystem::path               _config_file;
-
-	/// Keys the player is currently pressing.
-	static std::vector<sf::Keyboard::Key> _pressed_keys;
 
 	/// Bidrectional key-to-button mappings.
 	keyboard_to_controller_t              _key_mappings;
+
+	/// Keyboard keys the player is currently pressing.
+	static std::vector<sf::Keyboard::Key> _pressed_keys;
 };
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 /**
- * \brief Player character controller.
+ * \brief
+ * Player controller.
  */
 class PlayerController : public Controller
 {
 public:
 	/**
-	 * \brief Configure controller using settings from controller/player.json.
+	 * \brief 
+	 * Constructs a controller using keyboard mappings found in
+	 * asset/controller/player.json.
+	 * 
+	 * \remark
+	 * If the file doesn't exist, the default keyboard mapping will be used. 
+	 * Either way, upon destruction, this object will save its mappings to the 
+	 * file.
 	 */
 	PlayerController();
 };
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 /**
- * \brief Enemy character controller using settings found in 
- * 
- * \remark This class allows testing for enemy action.
+ * \brief
+ * Enemy character controller
  */
 class EnemyController : public Controller
 {
 public:
 	/**
-	 * \brief Configure controller using settings from controller/enemy.json.
+	 * \brief
+	 * Constructs a controller using keyboard mappings found in
+	 * asset/controller/enemy.json.
+	 * 
+	 * \remark
+	 * If the file doesn't exist, the default keyboard mapping will be used. 
+	 * Either way, upon destruction, this object will save its mappings to the 
+	 * file. This class is intended to test enemy actions.
 	 */
 	EnemyController();
 };
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 } // namespace nemo

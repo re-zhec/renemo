@@ -5,19 +5,32 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "Entity/EntityInput.hpp"
+
 namespace nemo
 {
 
-class GameObject;
-
-class GameObjectPhysics
+/**
+ * \brief 
+ */
+class NpcInput : public EntityInput
 {
 public:
-	virtual ~GameObjectPhysics() = default;
+	/**
+	 * \brief
+	 */
+	NpcInput();
 
+	/**
+	 * \brief Controls player action on the overworld map.
+	 */
 	virtual void
-	updateObjectInteraction(GameObject& obj)
-	const = 0;
+	updateObjectAction(Entity& obj)
+	const override;
+
+private:
+	/// NPC's moving speed.
+	constexpr static float _moving_speed = 2.0f;
 };
 
 } // namespace nemo

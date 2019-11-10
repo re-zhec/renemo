@@ -1,11 +1,11 @@
+#include "Game.hpp"
+#include "Controller.hpp"
+
 #include <cstdlib>
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/VideoMode.hpp>
-
-#include "Game.hpp"
-#include "Controller.hpp"
 
 int
 main()

@@ -34,7 +34,7 @@ setup:
 	mkdir -p $(OBJDIR)
 	mkdir -p $(EXEDIR)
 	mkdir -p $(EXEDIR)/font
-	cp -r data $(EXEDIR)
+	cp -r asset $(EXEDIR)
 	
 clean:
 	rm -rf $(EXEDIR)

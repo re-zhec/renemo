@@ -3,8 +3,8 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-#include "GameObject/GameObjectCreator.hpp"
-#include "GameObject/GameObject.hpp"
+#include "Entity/Npc/NpcGraphics.hpp"
+#include "Entity/Entity.hpp"
 
 namespace nemo
 {
@@ -12,27 +12,13 @@ namespace nemo
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-std::unique_ptr< GameObject >
-GameObjectCreator::overworldNpc()
+void
+NpcGraphics::updateObjectDisplay(
+	Entity&       obj,
+	sf::RenderWindow& window
+) const
 {
-	return std::make_unique< GameObject >(
-		std::make_unique< OverworldNpcInput >(),
-		std::make_unique< OverworldNpcPhysics >(),
-		std::make_unique< OverworldNpcGraphics >()
-	);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-std::unique_ptr< GameObject >
-GameObjectCreator::overworldPlayer()
-{
-	return std::make_unique< GameObject >(
-		std::make_unique< OverworldPlayerInput >(),
-		std::make_unique< OverworldNpcPhysics >(),
-		std::make_unique< OverworldNpcGraphics >()
-	);
+	obj.drawOnWindow(window);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

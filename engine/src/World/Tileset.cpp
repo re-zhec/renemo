@@ -3,9 +3,15 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-#include "Game.hpp"
-#include "Entity/EntityCreator.hpp"
-#include "debug.hpp"
+#include "World/Tileset.hpp"
+#include "type/Vector2.hpp"
+#include "GameRoot.hpp"
+
+#include <sstream>
+#include <algorithm>
+#include <exception>
+
+#include <boost/filesystem.hpp>
 
 namespace nemo
 {
@@ -13,57 +19,74 @@ namespace nemo
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-Game::Game()
-	: _is_playing(true)
-	, _player(EntityCreator::npc())
-	, _npc(EntityCreator::player())
+Tileset::Tileset(boost::filesystem::path tilemap_file)
+{
+	tilemap_file = boost::filesystem::absolute(tilemap_file, getTilesetDir());
+
+	if (!_texture.loadFromFile(tilemap_file.string())) {
+		std::stringstream err_msg;
+		err_msg << "Failed to load texture from " << tilemap_file;
+		throw std::ios_base::failure(err_msg.str());
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+sf::Sprite
+Tileset::getSprite(const type::Vector2 idx)
+const
+{
+	constexpr auto pixels_per_unit = 16;
+	
+	const sf::IntRect portion_to_crop(
+		idx.sfVector2< int >() * pixels_per_unit, 
+		{ pixels_per_unit, pixels_per_unit }
+	);
+
+	return sf::Sprite(_texture, portion_to_crop);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+boost::filesystem::path
+Tileset::getTilesetDir()
+{
+	return GameRoot::getSpriteDir() / "tileset";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+UrbanTilemap::UrbanTilemap()
+	: Tileset("urban.png")
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-Game&
-Game::getInstance()
+ForestTilemap::ForestTilemap()
+	: Tileset("forest.png")
 {
-	static Game instance;
-	return instance;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-void
-Game::pause()
-noexcept
+std::unique_ptr< Tileset >
+makeTileset(const TilesetType type)
 {
-	STDINFO("Game paused");
-	_is_playing = false;
-}
+	switch (type) {
+		case TilesetType::Urban:
+		return std::make_unique< UrbanTilemap >();
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-void
-Game::resume()
-noexcept
-{
-	STDINFO("Game resumed");
-	_is_playing = true;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-void
-Game::updateFrame(sf::RenderWindow& window)
-{
-	if (!_is_playing) {
-		return;
+		case TilesetType::Forest:
+		return std::make_unique< ForestTilemap >();
 	}
 
-	_player->updateObject(window);
-	_npc->updateObject(window);
+	return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

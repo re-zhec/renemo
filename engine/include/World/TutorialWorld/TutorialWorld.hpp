@@ -5,19 +5,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "World/World.hpp"
+
 namespace nemo
 {
 
-class GameObject;
-
-class GameObjectInput
+class TutorialWorld : public World
 {
-public:
-	virtual ~GameObjectInput() = default;
-	
-	virtual void
-	updateObjectAction(GameObject& obj)
-	const = 0;
+	/**
+	 * \brief
+	 */
+	TutorialWorld();
 };
 
 } // namespace nemo

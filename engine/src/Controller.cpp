@@ -11,18 +11,18 @@
  * install.
  */
 
+#include "Controller.hpp"
+#include "debug.hpp"
+#include "GameRoot.hpp"
+
 #include <fstream>
-#include <iomanip>
 #include <string>
 #include <algorithm>
-#include <exception>
 
 #include <boost/assign/list_of.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+#include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
-
-#include "Controller.hpp"
-#include "common_utils.hpp"
 
 namespace nemo
 {
@@ -48,10 +48,10 @@ namespace
 		( "cancel", Button::Cancel )
 		( "select", Button::Select )
 		( "pause" , Button::Pause  );
-
-	// Directory to hold all controller configuration files.
-	const boost::filesystem::path controller_dir("data/controller");
 }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 std::vector< sf::Keyboard::Key >
 Controller::_pressed_keys = {};
@@ -68,7 +68,7 @@ Controller::Controller()
 ////////////////////////////////////////////////////////////////////////////////
 
 Controller::Controller(const boost::filesystem::path& file)
-	: _config_file(file)
+	: _config_file(boost::filesystem::absolute(file, getControllerDir()))
 {
 	std::ifstream config_ifs(_config_file.string());
 
@@ -78,7 +78,6 @@ Controller::Controller(const boost::filesystem::path& file)
 		return;
 	}
 
-	STDINFO("Reading " << _config_file << " for controller " << this);
 	nlohmann::json config;
 	
 	try {
@@ -89,29 +88,31 @@ Controller::Controller(const boost::filesystem::path& file)
 		useDefaultKeyMappings();
 		return;
 	}
-	
-	bool is_valid_controller = true;
-	
+		
 	for (const auto& [button_field, key] : config.items()) {
+		bool valid_mapping = false;
+		
 		try {
 			// Get the controller button associated with the JSON property name.
 			const Button button = fields_to_buttons_.left.at(button_field);
-			
 			// Add new mapping.
-			// On the last iteration, is_valid_controller will indicate whether
-			// the new configurations are valid or not.
-			is_valid_controller = changeKeyMapping(key, button);
+			valid_mapping = changeKeyMapping(key, button);
 		}
 		catch (const std::out_of_range& e) {
 			STDWARN(e.what());
+		}
+
+		if (!valid_mapping) {
 			STDWARN("Skipped mapping [" << button_field << "] to key " << key);
 		}
 	}
 
-	if (!is_valid_controller) {
+	if (!isValidController()) {
 		STDWARN("Incomplete/missing mapping(s) in " << _config_file);
 		useDefaultKeyMappings();
 	}
+
+	STDINFO("Loaded " << _config_file << " config for controller " << this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,19 +133,17 @@ Controller::~Controller()
 void
 Controller::useDefaultKeyMappings()
 {
-	STDINFO("Using default key mapping for controller " << this);
+	STDINFO("Used default key mapping for controller " << this);
 
-	try {
-		changeKeyMapping(sf::Keyboard::A,         Button::Left  );
-		changeKeyMapping(sf::Keyboard::W,         Button::Up    );
-		changeKeyMapping(sf::Keyboard::D,         Button::Right );
-		changeKeyMapping(sf::Keyboard::S,         Button::Down  );
-		changeKeyMapping(sf::Keyboard::Q,         Button::Cancel);
-		changeKeyMapping(sf::Keyboard::Enter,     Button::Select);
-		changeKeyMapping(sf::Keyboard::Backslash, Button::Pause );
-	}
-	catch (const std::out_of_range& e) {
-		STDWARN(e.what());
+	changeKeyMapping(sf::Keyboard::A,         Button::Left  );
+	changeKeyMapping(sf::Keyboard::W,         Button::Up    );
+	changeKeyMapping(sf::Keyboard::D,         Button::Right );
+	changeKeyMapping(sf::Keyboard::S,         Button::Down  );
+	changeKeyMapping(sf::Keyboard::Q,         Button::Cancel);
+	changeKeyMapping(sf::Keyboard::Enter,     Button::Select);
+	changeKeyMapping(sf::Keyboard::Backslash, Button::Pause );
+
+	if (!isValidController()) {
 		STDERR("Default key mapping needs to change");
 	}
 }
@@ -198,7 +197,7 @@ const
 		Button::Left, Button::Up, Button::Right, Button::Down
 	};
 
-	// Limit the query to only directional buttons.
+	// Limit the query to directional buttons only.
 	return getPressedButton(limit_buttons_to);
 }
 
@@ -213,7 +212,7 @@ const
 		Button::Cancel, Button::Select, Button::Pause
 	};
 
-	// Limit the query to only selectional buttons.
+	// Limit the query to selection buttons only.
 	return getPressedButton(limit_buttons_to);
 }
 
@@ -221,7 +220,7 @@ const
 ////////////////////////////////////////////////////////////////////////////////
 
 std::optional< Button >
-Controller::getPressedButton(const std::vector< Button > allowed_buttons)
+Controller::getPressedButton(const std::vector< Button > button_filters)
 const
 {
 	// Iterating in reverse order priortizes more recently pressed keys. If the
@@ -238,9 +237,9 @@ const
 
 		const Button button = key_to_button->second;
 		
-		if (!allowed_buttons.empty() && // button search filter is supplied
+		if (!button_filters.empty() && // button search filter is supplied
 			std::none_of(
-				allowed_buttons.cbegin(), allowed_buttons.cend(), 
+				button_filters.cbegin(), button_filters.cend(), 
 				[button] (const Button allowed) { return allowed == button; }
 			)) 
 		{
@@ -262,7 +261,8 @@ bool
 Controller::changeKeyMapping(const int keycode, const Button button)
 {
 	if (!isValidKeyCode(keycode)) {
-		throw std::out_of_range("Invalid key " + std::to_string(keycode));
+		STDWARN("Invalid key " << keycode);
+		return false;
 	}
 
 	const sf::Keyboard::Key key = static_cast< sf::Keyboard::Key>(keycode);
@@ -275,9 +275,7 @@ Controller::changeKeyMapping(const int keycode, const Button button)
 	// Add new mapping.
 	_key_mappings.push_back(keyboard_to_controller_t::value_type(key, button));
 
-	// With 1:1 bidrectional mapping being enforced, the controller is valid if 
-	// we have the same number of mappings as the number of possible buttons.
-	return _key_mappings.size() == fields_to_buttons_.size();
+	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -287,6 +285,14 @@ bool
 Controller::saveKeyMappings(const boost::filesystem::path& file)
 const
 {
+	try {
+		boost::filesystem::create_directories( getControllerDir() );
+	}
+	catch (const boost::system::error_code& ec) {
+		STDWARN("Failed to create " << getControllerDir());
+		return false;
+	}
+
 	std::ofstream config_ofs(file.string());
 
 	if (!config_ofs) {
@@ -307,9 +313,22 @@ const
 		config[button_field] = key;
 	}
 
-	config_ofs << std::setw(4) << config;
+	// Dump json to file, using an indentation of 4 spaces.
+	config_ofs << config.dump(4);
 	STDINFO("Saved controller " << this << " settings to " << file);
 	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+bool
+Controller::isValidController()
+const noexcept
+{
+	// With 1:1 bidrectional mapping being enforced, the controller is valid if 
+	// we have the same number of mappings as the number of possible buttons.
+	return _key_mappings.size() == fields_to_buttons_.size();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -326,8 +345,17 @@ noexcept
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+boost::filesystem::path
+Controller::getControllerDir()
+{
+	return GameRoot::getAssetDir() / "controller";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 PlayerController::PlayerController()
-	: Controller(controller_dir / "player.json")
+	: Controller("player.json")
 {
 }
 
@@ -335,11 +363,11 @@ PlayerController::PlayerController()
 ////////////////////////////////////////////////////////////////////////////////
 
 EnemyController::EnemyController()
-	: Controller(controller_dir / "enemy.json")
+	: Controller("enemy.json")
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-} // namespace nemo
+}

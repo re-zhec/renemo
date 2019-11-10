@@ -5,21 +5,38 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <SFML/Graphics/RenderWindow.hpp>
+#include "Entity/EntityInput.hpp"
+#include "Controller.hpp"
+
+#include <memory>
 
 namespace nemo
 {
 
-class GameObject;
-
-class GameObjectGraphics
+/**
+ * \brief 
+ */
+class PlayerInput : public EntityInput
 {
 public:
-	virtual ~GameObjectGraphics() = default;
+	/**
+	 * \brief
+	 */
+	PlayerInput();
 
+	/**
+	 * \brief Controls player action on the overworld map.
+	 */
 	virtual void
-	updateObjectDisplay(GameObject& obj, sf::RenderWindow& window)
-	const = 0;
+	updateObjectAction(Entity& obj)
+	const override;
+
+private:
+	/// Player controller.
+	std::unique_ptr< Controller > _controller;
+
+	/// Player's moving speed.
+	constexpr static float _moving_speed = 2.0f;
 };
 
-} // namespace nemo
+}

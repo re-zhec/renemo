@@ -5,22 +5,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "GameObject/GameObjectPhysics.hpp"
+#include <SFML/Graphics/RenderWindow.hpp>
 
 namespace nemo
 {
 
-/**
- * \brief 
- */
-class OverworldNpcPhysics : public GameObjectPhysics
+class Entity;
+
+class EntityGraphics
 {
 public:
-	virtual void
-	updateObjectInteraction(GameObject& obj)
-	const override;
+	virtual ~EntityGraphics() = default;
 
-private:
+	virtual void
+	updateObjectDisplay(Entity& obj, sf::RenderWindow& window)
+	const = 0;
 };
 
 } // namespace nemo

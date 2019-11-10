@@ -13,25 +13,25 @@
 namespace nemo
 {
 
-class GameObjectInput;
-class GameObjectPhysics;
-class GameObjectGraphics;
+class EntityInput;
+class EntityPhysics;
+class EntityGraphics;
 
 /**
  * \brief A base game object
  */
-class GameObject
+class Entity
 {
 public:
-	virtual ~GameObject() = default;
+	virtual ~Entity() = default;
 	
 	/**
 	 * \brief
 	 */
-	GameObject(
-		std::unique_ptr< GameObjectInput >&&    input,
-		std::unique_ptr< GameObjectPhysics >&&  physics,
-		std::unique_ptr< GameObjectGraphics >&& graphics
+	Entity(
+		std::unique_ptr< EntityInput >&&    input,
+		std::unique_ptr< EntityPhysics >&&  physics,
+		std::unique_ptr< EntityGraphics >&& graphics
 	);
 
 	/**
@@ -97,13 +97,13 @@ public:
 
 private:
 	/// Commits the object to an action.
-	std::unique_ptr< GameObjectInput >    _input;
+	std::unique_ptr< EntityInput >    _input;
 
 	/// Physical interaction with the game world.  
-	std::unique_ptr< GameObjectPhysics >  _physics;
+	std::unique_ptr< EntityPhysics >  _physics;
 	
 	/// Graphical display in the game window.
-	std::unique_ptr< GameObjectGraphics > _graphics;
+	std::unique_ptr< EntityGraphics > _graphics;
 
 	/// Object's hitbox.
 	sf::RectangleShape                    _hitbox;

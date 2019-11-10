@@ -5,60 +5,59 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include <memory>
+#include <unordered_map>
+
+#include <boost/multi_array.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
 namespace nemo
 {
 
-class Entity;
+namespace type {
+	struct x_t;
+	struct y_t;
+	class  Vector2;
+}
+
+class Tile;
+class Tileset;
+enum class TilesetType;
 
 /**
- * \brief Game
+ * \brief
  */
-class Game
+class World
 {
 public:
-	/**
-	 * \brief Creates and shares single game session.
-	 * 
-	 * \return Game session.
-	 */
-	static Game&
-	getInstance();
+	virtual
+	~World() = default;
 
 	/**
-	 * \brief Pauses game.
+	 * \brief
 	 */
 	void
-	pause()
+	resetToSize(type::Vector2 size)
 	noexcept;
 
 	/**
-	 * \brief Resumes game.
+	 * \brief
 	 */
 	void
-	resume()
-	noexcept;
+	setTileset(const TilesetType type);
 
 	/**
-	 * \brief Updates the current frame in the game loop.
-	 * 
-	 * \param window Game window to display new frame.
+	 * \brief
 	 */
 	void
-	updateFrame(sf::RenderWindow& window);
-	
+	drawWorld(sf::RenderWindow& window)
+	const;
+
 private:
-	/**
-	 * \brief Creates game.
-	 */
-	Game();
-
-	/// Whether game is paused or running.
-	bool _is_playing;
-
-	std::unique_ptr< Entity > _player;
-	std::unique_ptr< Entity > _npc;
+	using tile_array_t = boost::multi_array< std::shared_ptr<Tile>, 2 >;
+	
+	tile_array_t               _tiles;
+	std::shared_ptr< Tileset > _tileset;
 };
 
 } // namespace nemo

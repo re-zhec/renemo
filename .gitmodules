@@ -1,3 +1,6 @@
 [submodule "engine/json"]
 	path = engine/json
 	url = https://github.com/nlohmann/json.git
+[submodule "engine/type_safe"]
+	path = engine/type_safe
+	url = https://github.com/foonathan/type_safe
