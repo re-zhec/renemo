@@ -224,13 +224,10 @@ public:
 	 * The keyboard mapping is valid if and only if each controller button is 
 	 * mapped to a unique keyboard key. It is not possible to have multiple 
 	 * keys mapped to one button and vice versa. This should be called after all
-	 * \link changKeyMapping.
+	 * \link changeKeyMapping.
 	 * 
 	 * \return
 	 * True if the keyboard mapping is valid, false otherwise.
-	 * 
-	 * \see
-	 * changeKeyMapping
 	 */
 	bool
 	isValidController()

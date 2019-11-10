@@ -89,6 +89,8 @@
 		"*.ipp": "cpp",
 		"forward_list": "cpp",
 		"random": "cpp",
-		"valarray": "cpp"
+		"valarray": "cpp",
+		"unordered_set": "cpp",
+		"regex": "cpp"
 	}
 }
