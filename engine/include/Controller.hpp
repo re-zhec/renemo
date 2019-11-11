@@ -56,7 +56,7 @@ enum class Button {
  * 	controller.changeKeyMapping(sf::Keyboard::O, Button::Cancel);
  * 	
  * 	while (window.isOpen()) {
- *    	sf::Event event;
+ *		sf::Event event;
  * 
  * 		if (!window.pollEvent(event)) {
  * 			continue;
@@ -85,7 +85,7 @@ enum class Button {
  * 			// move right
  * 			break;
  * 		}
- * }
+ *	}
  * \endcode
  */
 class Controller
