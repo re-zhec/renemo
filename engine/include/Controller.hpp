@@ -53,7 +53,7 @@ enum class Button {
  * 	window.setKeyRepeatEnabled(false);
  *  
  * 	nemo::Controller controller;
- *  controller.changeKeyMapping(sf::Keyboard::O, Button::Cancel);
+ * 	controller.changeKeyMapping(sf::Keyboard::O, Button::Cancel);
  * 	
  * 	while (window.isOpen()) {
  *    	sf::Event event;
