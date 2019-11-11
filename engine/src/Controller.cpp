@@ -140,8 +140,8 @@ Controller::useDefaultKeyMappings()
 	changeKeyMapping(sf::Keyboard::D,         Button::Right );
 	changeKeyMapping(sf::Keyboard::S,         Button::Down  );
 	changeKeyMapping(sf::Keyboard::Q,         Button::Cancel);
+	changeKeyMapping(sf::Keyboard::P,         Button::Pause );
 	changeKeyMapping(sf::Keyboard::Enter,     Button::Select);
-	changeKeyMapping(sf::Keyboard::Backslash, Button::Pause );
 
 	if (!isValidController()) {
 		STDERR("Default key mapping needs to change");

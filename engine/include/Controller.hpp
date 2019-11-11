@@ -21,8 +21,7 @@ namespace nemo
  * \brief
  * Enumeration for controller buttons.
  */
-enum class Button
-{
+enum class Button {
 	Left, 
 	Up,
 	Right,
@@ -36,8 +35,58 @@ enum class Button
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * \class
+ * Controller
+ * 
  * \brief
  * Keyboard controller.
+ * 
+ * This class maps keyboard input to controls in the game. Instead of reading 
+ * what key is pressed or released, the client code would read the "controller 
+ * button" that is being pressed or released. This class also allows the player 
+ * to change what keyboard key translates to which input command if, say, the 
+ * default mapping doesn't work out for any reason.
+ * 
+ * Usage example:
+ * \code
+ * 	sf::RenderWindow window(sf::VideoMode(1280, 720), "Nemo");
+ * 	window.setKeyRepeatEnabled(false);
+ *  
+ * 	nemo::Controller controller;
+ *  controller.changeKeyMapping(sf::Keyboard::O, Button::Cancel);
+ * 	
+ * 	while (window.isOpen()) {
+ *    	sf::Event event;
+ * 
+ * 		if (!window.pollEvent(event)) {
+ * 			continue;
+ * 		}
+ *     	
+ * 		switch (event.type) {
+ * 			case sf::Event::KeyPressed:
+ * 			nemo::Controller::registerKeyPress(event.key.code);
+			break;
+
+			case sf::Event::KeyReleased:
+			nemo::Controller::registerKeyRelease(event.key.code);
+			break;
+ * 		}
+ *    	
+ * 		if (!controller->getPressedButton()) {
+ * 			continue;
+ * 		}
+ * 
+ * 		switch (*controller->getPressedButton()) {
+ * 			case Button::left:
+ * 			// move left
+ * 			break;
+ * 
+ * 			case Button::Right:
+ * 			// move right
+ * 			break;
+ * 		}
+ * }
+ * \endcode
  */
 class Controller
 {
@@ -61,12 +110,12 @@ public:
 	 * 
 	 * \code
 	 * {
-	 *     "down": 18,   // S key
-	 *     "left": 0,    // A key
-	 *     "right": 3,   // D key
-	 *     "up": 22,     // W key
+	 *     "down":   18, // S key
+	 *     "left":   0,  // A key
+	 *     "right":  3,  // D key
+	 *     "up":     22, // W key
 	 *     "cancel": 16, // Q key
-	 *     "pause": 53,  // Backslash key
+	 *     "pause":  47, // P key
 	 *     "select": 58  // Enter key
 	 * }
 	 * \endcode
@@ -267,7 +316,7 @@ private:
 	 *     D     => Right
 	 *     S     => Down
 	 *     Q     => Cancel
-	 *     \     => Pause
+	 *     P     => Pause
 	 *     Enter => Select
 	 */
 	void

@@ -27,11 +27,12 @@ noexcept
 	const auto [width, height] = size.sfVector2< int >();
 	_tiles = tile_array_t(boost::extents[width][height]);
 
-	for (auto t = _tiles.origin(); 
-		t != _tiles.origin() + _tiles.num_elements; ++t)
-	{
-		*t = std::make_unique< Tile >(row_t(0), column_t(0));
-	}
+	for (tile_array_t::index r = 0; r < height; ++r) {
+		for (tile_array_t::index c = 0; c < width; ++c) {
+			const type::Vector2 idx = { row_t(r), column_t(c) };
+			_tiles[r][c] = std::make_unique< Tile >(idx);
+		}
+	};
 }
 
 ////////////////////////////////////////////////////////////////////////////////
