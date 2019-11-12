@@ -48,6 +48,10 @@ namespace
 		( "cancel", Button::Cancel )
 		( "select", Button::Select )
 		( "pause" , Button::Pause  );
+
+	// Default path to a directory for keyboard mapping files.
+	const boost::filesystem::path controller_dir_ = GameRoot::getAssetDir() 
+		/ "controller";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +72,7 @@ Controller::Controller()
 ////////////////////////////////////////////////////////////////////////////////
 
 Controller::Controller(const boost::filesystem::path& file)
-	: _config_file(boost::filesystem::absolute(file, getControllerDir()))
+	: _config_file(file)
 {
 	std::ifstream config_ifs(_config_file.string());
 
@@ -110,6 +114,7 @@ Controller::Controller(const boost::filesystem::path& file)
 	if (!isValidController()) {
 		STDWARN("Incomplete/missing mapping(s) in " << _config_file);
 		useDefaultKeyMappings();
+		return;
 	}
 
 	STDINFO("Loaded " << _config_file << " config for controller " << this);
@@ -135,13 +140,13 @@ Controller::useDefaultKeyMappings()
 {
 	STDINFO("Used default key mapping for controller " << this);
 
-	changeKeyMapping(sf::Keyboard::A,         Button::Left  );
-	changeKeyMapping(sf::Keyboard::W,         Button::Up    );
-	changeKeyMapping(sf::Keyboard::D,         Button::Right );
-	changeKeyMapping(sf::Keyboard::S,         Button::Down  );
-	changeKeyMapping(sf::Keyboard::Q,         Button::Cancel);
-	changeKeyMapping(sf::Keyboard::P,         Button::Pause );
-	changeKeyMapping(sf::Keyboard::Enter,     Button::Select);
+	changeKeyMapping(sf::Keyboard::A,     Button::Left  );
+	changeKeyMapping(sf::Keyboard::W,     Button::Up    );
+	changeKeyMapping(sf::Keyboard::D,     Button::Right );
+	changeKeyMapping(sf::Keyboard::S,     Button::Down  );
+	changeKeyMapping(sf::Keyboard::Q,     Button::Cancel);
+	changeKeyMapping(sf::Keyboard::P,     Button::Pause );
+	changeKeyMapping(sf::Keyboard::Enter, Button::Select);
 
 	if (!isValidController()) {
 		STDERR("Default key mapping needs to change");
@@ -274,7 +279,6 @@ Controller::changeKeyMapping(const int keycode, const Button button)
 
 	// Add new mapping.
 	_key_mappings.push_back(keyboard_to_controller_t::value_type(key, button));
-
 	return true;
 }
 
@@ -286,10 +290,10 @@ Controller::saveKeyMappings(const boost::filesystem::path& file)
 const
 {
 	try {
-		boost::filesystem::create_directories( getControllerDir() );
+		boost::filesystem::create_directories(file.parent_path());
 	}
 	catch (const boost::system::error_code& ec) {
-		STDWARN("Failed to create " << getControllerDir());
+		STDWARN("Failed to create " << controller_dir_);
 		return false;
 	}
 
@@ -345,17 +349,8 @@ noexcept
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-boost::filesystem::path
-Controller::getControllerDir()
-{
-	return GameRoot::getAssetDir() / "controller";
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 PlayerController::PlayerController()
-	: Controller("player.json")
+	: Controller(controller_dir_ / "player.json")
 {
 }
 
@@ -363,7 +358,7 @@ PlayerController::PlayerController()
 ////////////////////////////////////////////////////////////////////////////////
 
 EnemyController::EnemyController()
-	: Controller("enemy.json")
+	: Controller(controller_dir_ / "enemy.json")
 {
 }
 

@@ -65,11 +65,11 @@ enum class Button {
  * 		switch (event.type) {
  * 			case sf::Event::KeyPressed:
  * 			nemo::Controller::registerKeyPress(event.key.code);
-			break;
-
-			case sf::Event::KeyReleased:
-			nemo::Controller::registerKeyRelease(event.key.code);
-			break;
+ * 			break;
+ * 
+ * 			case sf::Event::KeyReleased:
+ * 			nemo::Controller::registerKeyRelease(event.key.code);
+ * 			break;
  * 		}
  *    	
  * 		if (!controller->getPressedButton()) {
@@ -115,7 +115,7 @@ public:
 	 *     "right":  3,  // D key
 	 *     "up":     22, // W key
 	 *     "cancel": 16, // Q key
-	 *     "pause":  47, // P key
+	 *     "pause":  15, // P key
 	 *     "select": 58  // Enter key
 	 * }
 	 * \endcode
@@ -244,15 +244,16 @@ public:
 	 * \brief
 	 * Changes the key that a controller button is mapped to.
 	 * 
-	 * \param key       Code number of the key to map.
-	 * \param button    Button that key will be mapped to.
+	 * \param keycode    Code number of the key to map.
+	 * \param button     Button that key will be mapped to.
 	 * 
 	 * Each controller button is to be mapped to one unique keyboard key only. 
 	 * Likewise, one keyboard key cannot be mapped to multiple controller 
-	 * buttons. If \a key and \a button haven't been mapped before, then this 
-	 * method will simply create the new mapping. On the other hand, if \a key 
-	 * OR \a button are each already mapped to something else, those mappings 
-	 * will be removed to allow the new mapping between \a key and \a button.
+	 * buttons. If \a keycode and \a button haven't been mapped before, then 
+	 * this method will simply create the new mapping. On the other hand, if \a
+	 * keycode OR \a button are each already mapped to something else, those 
+	 * mapping will be removed to allow the new mapping between \a key and \a 
+	 * button.
 	 * 
 	 * Because of this behavior, it is possible to have a controller with 
 	 * unmapped buttons. \link isValidController should be called after 
@@ -260,11 +261,12 @@ public:
 	 * unmapped.
 	 * 
 	 * \return
-	 * False \a key is not within \link sf::Keyboard::Key's enum range. The 
-	 * previous mapping is kept in this case.
+	 * False if \a keycode is not within \link sf::Keyboard::Key's enum range.
+	 * The previous mapping is kept in this case.
+	 * True if otherwise.
 	 */
 	bool
-	changeKeyMapping(const int key, const Button button);
+	changeKeyMapping(const int keycode, const Button button);
 
 	/**
 	 * \brief
@@ -340,16 +342,6 @@ private:
 	isValidKeyCode(const int keycode)
 	noexcept;
 
-	/**
-	 * \brief
-	 * Get default path to a directory for keyboard mapping files.
-	 * 
-	 * \return
-	 * Absolute path to the keyboard mapping directory.
-	 */
-	static boost::filesystem::path
-	getControllerDir();
-
 	// Type alias
 	using keyboard_to_controller_t = boost::bimap< 
 		boost::bimaps::unordered_set_of< sf::Keyboard::Key >,
@@ -358,13 +350,13 @@ private:
 	>;
 
 	/// Path to controller's keyboard mapping file.
-	boost::filesystem::path               _config_file;
+	boost::filesystem::path                 _config_file;
 
 	/// Bidrectional key-to-button mappings.
-	keyboard_to_controller_t              _key_mappings;
+	keyboard_to_controller_t                _key_mappings;
 
 	/// Keyboard keys the player is currently pressing.
-	static std::vector<sf::Keyboard::Key> _pressed_keys;
+	static std::vector< sf::Keyboard::Key > _pressed_keys;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
