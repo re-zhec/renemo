@@ -267,7 +267,7 @@ Controller::changeKeyMapping(const int keycode, const Button button)
 	_key_mappings.right.erase(button);
 
 	// Add new mapping.
-	_key_mappings.push_back(keyboard_to_controller_t::value_type(key, button));
+	_key_mappings.push_back({ key, button });
 	return true;
 }
 
@@ -278,18 +278,12 @@ bool
 Controller::saveKeyMappings(const boost::filesystem::path& file)
 const
 {
-	try {
-		boost::filesystem::create_directories(file.parent_path());
-	}
-	catch (const boost::system::error_code& ec) {
-		STDWARN("Failed to create " << controller_dir_);
-		return false;
-	}
-
+	boost::system::error_code ec;
+	boost::filesystem::create_directories(file.parent_path(), ec);
 	std::ofstream config_ofs(file.string());
 
 	if (!config_ofs) {
-		STDWARN("Failed to create " << file << " for controller " << this);
+		STDWARN("Failed to create " << file);
 		return false;
 	}
 
@@ -303,6 +297,12 @@ const
 
 	// Dump json to file, using an indentation of 4 spaces.
 	config_ofs << config.dump(4);
+
+	if (!config_ofs) {
+		STDWARN("Write error in " << file);
+		return false;
+	}
+
 	STDINFO("Saved controller " << this << " settings to " << file);
 	return true;
 }
@@ -338,4 +338,4 @@ EnemyController::EnemyController()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-}
+} // namespace nemo
