@@ -52,6 +52,16 @@ namespace
 	// Default path to a directory for keyboard mapping files.
 	const boost::filesystem::path controller_dir_ = GameRoot::getAssetDir() 
 		/ "controller";
+
+
+	// Checks if a key code is a valid sf::Keyboard::Key enum value.
+	bool
+	isValidKeyCode(const int keycode)
+	noexcept
+	{
+		return keycode > static_cast< int >(sf::Keyboard::Unknown) &&
+		keycode <= static_cast< int >(sf::Keyboard::Enter);
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -333,17 +343,6 @@ const noexcept
 	// With 1:1 bidrectional mapping being enforced, the controller is valid if 
 	// we have the same number of mappings as the number of possible buttons.
 	return _key_mappings.size() == fields_to_buttons_.size();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-bool
-Controller::isValidKeyCode(const int keycode)
-noexcept
-{	
-	return keycode > static_cast< int >(sf::Keyboard::Unknown) &&
-		keycode <= static_cast< int >(sf::Keyboard::Enter);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

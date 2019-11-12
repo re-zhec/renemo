@@ -252,17 +252,23 @@ public:
 	 * buttons. If \a keycode and \a button haven't been mapped before, then 
 	 * this method will simply create the new mapping. On the other hand, if \a
 	 * keycode OR \a button are each already mapped to something else, those 
-	 * mapping will be removed to allow the new mapping between \a key and \a 
-	 * button.
+	 * mapping will be removed to allow the new mapping between \a keycode and 
+	 * \a button.
 	 * 
 	 * Because of this behavior, it is possible to have a controller with 
 	 * unmapped buttons. \link isValidController should be called after 
 	 * changing the keyboard mapping to check whether any buttons are left 
 	 * unmapped.
 	 * 
+	 * \warning
+	 * It is possible for this method to fail and return a false. In this case, 
+	 * the previous mapping is kept. Key codes are represented as integers in 
+	 * a json, and to protect against users entering any integer for a key, 
+	 * the method checks that \a keycode is a valid \link sf::Keyboard::Key enum
+	 * value.
+	 * 
 	 * \return
 	 * False if \a keycode is not within \link sf::Keyboard::Key's enum range.
-	 * The previous mapping is kept in this case.
 	 * True if otherwise.
 	 */
 	bool
@@ -323,24 +329,6 @@ private:
 	 */
 	void
 	useDefaultKeyMappings();
-
-	/**
-	 * \brief 
-	 * Checks if a key code is a valid \link sf::Keyboard::Key enum value.
-	 * 
-	 * \param keycode
-	 * Code number.
-	 * 
-	 * Keycodes are represented as integers in a keyboard mapping file. This 
-	 * method protects against numbers that are not within range of \link 
-	 * sf::Keybaord::Key's enumeration.
-	 * 
-	 * \return 
-	 * True if yes, false otherwise.
-	 */
-	static bool
-	isValidKeyCode(const int keycode)
-	noexcept;
 
 	// Type alias
 	using keyboard_to_controller_t = boost::bimap< 
