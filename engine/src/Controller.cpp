@@ -80,7 +80,7 @@ Controller::Controller(const boost::filesystem::path& file)
 		
 	for (const auto& [button_field, key] : config.items()) {
 		// Warning message to issue should this particular mapping fails.
-		const auto warn_skipped_mapping = [b = &button_field, k = &key] () {
+		const auto warn_skipped_mapping = [b = &button_field, k = key] () {
 			STDWARN("Skipped mapping [" << b << "] to key " << k);
 		};
 
@@ -259,7 +259,7 @@ Controller::changeKeyMapping(const int keycode, const Button button)
 		return false;
 	}
 
-	const sf::Keyboard::Key key = static_cast< sf::Keyboard::Key>(keycode);
+	const auto key = *magic_enum::enum_cast< sf::Keyboard::Key >(keycode);
 
 	// Delete whatever the button and key were previously mapped to. A key 
 	// cannot be mapped to multiple buttons, and vice versa.
@@ -290,7 +290,7 @@ const
 	nlohmann::json config;
 
 	for (const auto& [key, button] : _key_mappings.right) {
-		// Use the button's json property name.
+		// Use the button's name as the json property name.
 		const auto button_field = std::string(magic_enum::enum_name(button));
 		config[button_field] = key;
 	}
