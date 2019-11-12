@@ -3,14 +3,6 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-
-/**
- * \todo Replace \a fields_to_buttons_ and reimplement \link 
- * nemo::Controller::isValidKeyCode with Neargye's magic_enum 
- * (https://github.com/Neargye/magic_enum) when MinGW comes with GCC 9.0+ 
- * install.
- */
-
 #include "Controller.hpp"
 #include "debug.hpp"
 #include "GameRoot.hpp"
@@ -23,6 +15,7 @@
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
+#include <magic_enum.hpp>
 
 namespace nemo
 {
@@ -32,35 +25,17 @@ namespace nemo
 
 namespace
 {
-	using fields_to_controller_t = boost::bimap< 
-		boost::bimaps::unordered_set_of< std::string >, 
-		boost::bimaps::unordered_set_of< Button >,
-		boost::bimaps::list_of_relation
-	>;
-	
-	// Mapping JSON property names to their respective controller buttons.
-	const static fields_to_controller_t fields_to_buttons_ 
-		= boost::assign::list_of< fields_to_controller_t::relation >
-		( "left"  , Button::Left   )
-		( "up"    , Button::Up     )
-		( "right" , Button::Right  )
-		( "down"  , Button::Down   )
-		( "cancel", Button::Cancel )
-		( "select", Button::Select )
-		( "pause" , Button::Pause  );
-
 	// Default path to a directory for keyboard mapping files.
 	const boost::filesystem::path controller_dir_ = GameRoot::getAssetDir() 
 		/ "controller";
-
 
 	// Checks if a key code is a valid sf::Keyboard::Key enum value.
 	bool
 	isValidKeyCode(const int keycode)
 	noexcept
 	{
-		return keycode > static_cast< int >(sf::Keyboard::Unknown) &&
-		keycode <= static_cast< int >(sf::Keyboard::Enter);
+		const auto key = magic_enum::enum_cast< sf::Keyboard::Key >(keycode);
+		return key.has_value();
 	}
 }
 
@@ -104,20 +79,25 @@ Controller::Controller(const boost::filesystem::path& file)
 	}
 		
 	for (const auto& [button_field, key] : config.items()) {
-		bool valid_mapping = false;
-		
-		try {
-			// Get the controller button associated with the JSON property name.
-			const Button button = fields_to_buttons_.left.at(button_field);
-			// Add new mapping.
-			valid_mapping = changeKeyMapping(key, button);
-		}
-		catch (const std::out_of_range& e) {
-			STDWARN(e.what());
-		}
+		// Warning message to issue should this particular mapping fails.
+		const auto warn_skipped_mapping = [b = &button_field, k = &key] () {
+			STDWARN("Skipped mapping [" << b << "] to key " << k);
+		};
 
-		if (!valid_mapping) {
-			STDWARN("Skipped mapping [" << button_field << "] to key " << key);
+		// Identify controller button from the json property name.
+		const auto button = magic_enum::enum_cast< Button >(button_field);
+
+		if (!button) {
+			STDWARN("Unknown control found: [" << button_field << "]");
+			warn_skipped_mapping();
+			continue;
+		}
+		
+		// Add new mapping.
+		if (!changeKeyMapping(key, *button)) {
+			STDWARN("Invalid key: " << key);
+			warn_skipped_mapping();
+			continue;
 		}
 	}
 
@@ -276,7 +256,6 @@ bool
 Controller::changeKeyMapping(const int keycode, const Button button)
 {
 	if (!isValidKeyCode(keycode)) {
-		STDWARN("Invalid key " << keycode);
 		return false;
 	}
 
@@ -317,13 +296,8 @@ const
 	nlohmann::json config;
 
 	for (const auto& [key, button] : _key_mappings.right) {
-		assert(
-			fields_to_buttons_.right.find(button) !=
-			fields_to_buttons_.right.end()
-		);
-
-		// Get the button's json property name.
-		const std::string button_field = fields_to_buttons_.right.at(button);
+		// Use the button's json property name.
+		const auto button_field = std::string(magic_enum::enum_name(button));
 		config[button_field] = key;
 	}
 
@@ -342,7 +316,7 @@ const noexcept
 {
 	// With 1:1 bidrectional mapping being enforced, the controller is valid if 
 	// we have the same number of mappings as the number of possible buttons.
-	return _key_mappings.size() == fields_to_buttons_.size();
+	return _key_mappings.size() == magic_enum::enum_count< Button >();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

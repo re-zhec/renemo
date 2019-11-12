@@ -4,3 +4,6 @@
 [submodule "engine/type_safe"]
 	path = engine/type_safe
 	url = https://github.com/foonathan/type_safe
+[submodule "engine/magic_enum"]
+	path = engine/magic_enum
+	url = https://github.com/Neargye/magic_enum

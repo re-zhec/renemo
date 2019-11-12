@@ -6,6 +6,7 @@
 				"${workspaceFolder}/engine/include",
 				"${workspaceFolder}/engine/type_safe/include",
 				"${workspaceFolder}/engine/json/single_include",
+				"${workspaceFolder}/engine/magic_enum/include",
 				"C:/SFML/include",
 				"C:/MinGW/include/c++/8.2.0",
 				"C:/MinGW/include"

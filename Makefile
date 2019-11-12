@@ -12,6 +12,7 @@ CPPFLAGS += -Iengine/include
 CPPFLAGS += -Iengine/json/single_include
 CPPFLAGS += -Iengine/type_safe/include
 CPPFLAGS += -Iengine/type_safe/external/debug_assert
+CPPFLAGS += -Iengine/magic_enum/include
 
 CPPFLAGS += -IC:/SFML/include
 CPPFLAGS += -IC:/MinGW/include

@@ -1,9 +1,9 @@
 {
-    "cancel": 16,
-    "down": 18,
-    "left": 0,
-    "pause": 15,
-    "right": 3,
-    "select": 58,
-    "up": 22
+    "Cancel": 16,
+    "Down": 18,
+    "Left": 0,
+    "Pause": 15,
+    "Right": 3,
+    "Select": 58,
+    "Up": 22
 }

@@ -110,13 +110,13 @@ public:
 	 * 
 	 * \code
 	 * {
-	 *     "down":   18, // S key
-	 *     "left":   0,  // A key
-	 *     "right":  3,  // D key
-	 *     "up":     22, // W key
-	 *     "cancel": 16, // Q key
-	 *     "pause":  15, // P key
-	 *     "select": 58  // Enter key
+	 *     "Down":   18, // S key
+	 *     "Left":   0,  // A key
+	 *     "Right":  3,  // D key
+	 *     "Up":     22, // W key
+	 *     "Cancel": 16, // Q key
+	 *     "Pause":  15, // P key
+	 *     "Select": 58  // Enter key
 	 * }
 	 * \endcode
 	 * 
