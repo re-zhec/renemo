@@ -341,10 +341,10 @@ private:
 	useDefaultKeyMappings();	
 
 	/// Path to controller's keyboard mapping file.
-	boost::filesystem::path                 _config_file;
+	boost::filesystem::path     _config_file;
 
 	/// Bidrectional key-to-control mappings.
-	keyboard_to_controller_t                _key_mappings;
+	keyboard_to_controller_t    _key_mappings;
 
 	/// Keyboard keys the player is currently pressing.
 	static std::vector< key_t > _pressed_keys;
