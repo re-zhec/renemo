@@ -28,21 +28,12 @@ namespace
 	// Default path to a directory for keyboard mapping files.
 	const boost::filesystem::path controller_dir_ = GameRoot::getAssetDir() 
 		/ "controller";
-
-	// Checks if a key code is a valid sf::Keyboard::Key enum value.
-	bool
-	isValidKeyCode(const int keycode)
-	noexcept
-	{
-		const auto key = magic_enum::enum_cast< sf::Keyboard::Key >(keycode);
-		return key.has_value();
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-std::vector< sf::Keyboard::Key >
+std::vector< Controller::key_t >
 Controller::_pressed_keys = {};
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -78,13 +69,13 @@ Controller::Controller(const boost::filesystem::path& file)
 		return;
 	}
 		
-	for (const auto& [button_field, key] : config.items()) {
+	for (const auto& [button_field, keycode] : config.items()) {
 		// Warning message to issue should this particular mapping fails.
-		const auto warn_skipped_mapping = [b = &button_field, k = key] () {
+		const auto warn_skipped_mapping = [b = &button_field, k = keycode] () {
 			STDWARN("Skipped mapping [" << b << "] to key " << k);
 		};
 
-		// Identify controller button from the json property name.
+		// Identify controller button from json property name.
 		const auto button = magic_enum::enum_cast< Button >(button_field);
 
 		if (!button) {
@@ -92,13 +83,18 @@ Controller::Controller(const boost::filesystem::path& file)
 			warn_skipped_mapping();
 			continue;
 		}
+
+		// Keys are represented as integers in the json file.
+		const auto key = magic_enum::enum_cast< key_t >(keycode);
 		
-		// Add new mapping.
-		if (!changeKeyMapping(key, *button)) {
-			STDWARN("Invalid key: " << key);
+		if (!key) {
+			STDWARN("Invalid key: " << keycode);
 			warn_skipped_mapping();
 			continue;
 		}
+
+		// Add new mapping.
+		changeKeyMapping(*key, *button);
 	}
 
 	if (!isValidController()) {
@@ -130,13 +126,13 @@ Controller::useDefaultKeyMappings()
 {
 	STDINFO("Used default key mapping for controller " << this);
 
-	changeKeyMapping(sf::Keyboard::A,     Button::Left  );
-	changeKeyMapping(sf::Keyboard::W,     Button::Up    );
-	changeKeyMapping(sf::Keyboard::D,     Button::Right );
-	changeKeyMapping(sf::Keyboard::S,     Button::Down  );
-	changeKeyMapping(sf::Keyboard::Q,     Button::Cancel);
-	changeKeyMapping(sf::Keyboard::P,     Button::Pause );
-	changeKeyMapping(sf::Keyboard::Enter, Button::Select);
+	changeKeyMapping(key_t::A,     Button::Left  );
+	changeKeyMapping(key_t::W,     Button::Up    );
+	changeKeyMapping(key_t::D,     Button::Right );
+	changeKeyMapping(key_t::S,     Button::Down  );
+	changeKeyMapping(key_t::Q,     Button::Cancel);
+	changeKeyMapping(key_t::P,     Button::Pause );
+	changeKeyMapping(key_t::Enter, Button::Select);
 
 	if (!isValidController()) {
 		STDERR("Default key mapping needs to change");
@@ -147,17 +143,12 @@ Controller::useDefaultKeyMappings()
 ////////////////////////////////////////////////////////////////////////////////
 
 void
-Controller::registerKeyPress(const sf::Keyboard::Key key)
+Controller::registerKeyPress(const key_t key)
 {
-	if (!isValidKeyCode(key)) {
-		return;
-	}
-
-	// Avoid adding a key that is already being pressed to the list of pressed 
-	// keys.
+	// Avoid adding a key already being pressed to the list of pressed keys.
 	if (std::none_of(
 		_pressed_keys.cbegin(), _pressed_keys.cend(), 
-		[key] (const sf::Keyboard::Key p) { return p == key; }
+		[key] (const key_t p) { return p == key; }
 	)) {
 		// Newly pressed key.
 		_pressed_keys.push_back(key);
@@ -169,12 +160,8 @@ Controller::registerKeyPress(const sf::Keyboard::Key key)
 ////////////////////////////////////////////////////////////////////////////////
 
 void
-Controller::registerKeyRelease(const sf::Keyboard::Key key)
+Controller::registerKeyRelease(const key_t key)
 {
-	if (!isValidKeyCode(key)) {
-		return;
-	}
-
 	// Remove key from the list of pressed keys.
 	auto keys_to_rm = std::remove(_pressed_keys.begin(), _pressed_keys.end(), key);
 	_pressed_keys.erase(keys_to_rm, _pressed_keys.end());
@@ -222,11 +209,11 @@ const
 	// up button is pressed while the left button is still pressed, for example,
 	// the up button will be used instead of the left button as long as both 
 	// buttons are held (assuming we're looking for any directional input).
-	for (const auto k : boost::adaptors::reverse(_pressed_keys)) {
+	for (const key_t k : boost::adaptors::reverse(_pressed_keys)) {
 		const auto key_to_button = _key_mappings.left.find(k);
 		
 		if (key_to_button == _key_mappings.left.end()) {
-			// This pressed key isn't mapped to any controller button.
+			// This pressed key isn't mapped to any control.
 			continue;
 		}
 
@@ -252,23 +239,16 @@ const
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-bool
-Controller::changeKeyMapping(const int keycode, const Button button)
+void
+Controller::changeKeyMapping(const key_t key, const Button button)
 {
-	if (!isValidKeyCode(keycode)) {
-		return false;
-	}
-
-	const auto key = *magic_enum::enum_cast< sf::Keyboard::Key >(keycode);
-
-	// Delete whatever the button and key were previously mapped to. A key 
-	// cannot be mapped to multiple buttons, and vice versa.
+	// Delete whatever the control and key were previously mapped to. A key 
+	// cannot be mapped to multiple controls, and vice versa.
 	_key_mappings.left.erase(key);
 	_key_mappings.right.erase(button);
 
 	// Add new mapping.
 	_key_mappings.push_back({ key, button });
-	return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -290,12 +270,12 @@ const
 	nlohmann::json config;
 
 	for (const auto& [key, button] : _key_mappings.right) {
-		// Use the button's name as the json property name.
+		// Use the controller input's name as the json property name.
 		const auto button_field = std::string(magic_enum::enum_name(button));
 		config[button_field] = key;
 	}
 
-	// Dump json to file, using an indentation of 4 spaces.
+	// Dump json to file, using a 4-space indentation.
 	config_ofs << config.dump(4);
 
 	if (!config_ofs) {
