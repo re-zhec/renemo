@@ -7,11 +7,11 @@
 
 #include <optional>
 #include <vector>
+#include <filesystem>
 
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
 #include <boost/bimap/list_of.hpp>
-#include <boost/filesystem/path.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
 namespace nemo
@@ -21,7 +21,8 @@ namespace nemo
  * \brief
  * Enumeration for controller inputs.
  */
-enum class Button {
+enum class Button
+{
 	Left, 
 	Up,
 	Right,
@@ -90,15 +91,9 @@ enum class Button {
  */
 class Controller
 {
-	// Type alias.
-	using key_t = sf::Keyboard::Key;
-	using keyboard_to_controller_t = boost::bimap< 
-		boost::bimaps::unordered_set_of< key_t >,
-		boost::bimaps::unordered_set_of< Button >,
-		boost::bimaps::list_of_relation
-	>;
-
 public:
+	using key_t = sf::Keyboard::Key;
+
 	/**
 	 * \brief
 	 * Constructs a controller that has default key mappings.
@@ -133,7 +128,7 @@ public:
 	 * nonexistent key, or if any parse or other file-reading errors occurred, 
 	 * then the controller will use the default keyboard mapping.
 	 */
-	Controller(const boost::filesystem::path& file);
+	Controller(const std::filesystem::path& file);
 
 	/**
 	 * \brief
@@ -320,10 +315,16 @@ public:
 	 * Controller for the json contents.
 	 */
 	bool
-	saveKeyMappings(const boost::filesystem::path& file)
+	saveKeyMappings(const std::filesystem::path& file)
 	const;
 
 private:
+	using keyboard_to_controller_t = boost::bimap< 
+		boost::bimaps::unordered_set_of< key_t >,
+		boost::bimaps::unordered_set_of< Button >,
+		boost::bimaps::list_of_relation
+	>;
+	
 	/**
 	 * \brief
 	 * Change current keyboard mappings to the default.
@@ -341,7 +342,7 @@ private:
 	useDefaultKeyMappings();	
 
 	/// Path to controller's keyboard mapping file.
-	boost::filesystem::path     _config_file;
+	std::filesystem::path       _config_file;
 
 	/// Bidrectional key-to-control mappings.
 	keyboard_to_controller_t    _key_mappings;

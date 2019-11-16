@@ -6,8 +6,8 @@
 #pragma once
 
 #include <memory>
+#include <filesystem>
 
-#include <boost/filesystem/path.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
@@ -15,7 +15,7 @@ namespace nemo
 {
 
 namespace type {
-	class Vector2;
+	struct RowColumnIndex;
 }
 
 /**
@@ -38,23 +38,34 @@ public:
 	/**
 	 * \brief
 	 */
-	Tileset(boost::filesystem::path tilemap_file);
+	Tileset(const std::filesystem::path& file);
 
 	/**
+	 * \brief 
+	 * Set the Tile Pixel Size object
+	 * 
+	 * \param length 
+	 */
+	void
+	setTilePixelSize(const int length);
+	
+	/**
 	 * \brief
+	 * 
+	 * \param rc
+	 * Row and column the tile is located in the tileset image.
+	 * 
+	 * \throw
+	 * std::ios_base::failure if the texture fails to load from the file for any
+	 * reasons.
 	 */
 	sf::Sprite
-	getSprite(const type::Vector2 idx)
+	getTileSprite(const type::RowColumnIndex rc)
 	const;
 
 private:
-	/**
-	 * \brief
-	 */
-	static boost::filesystem::path
-	getTilesetDir();
-
 	sf::Texture _texture;
+	int         _tile_pixel_length;
 };
 
 /**

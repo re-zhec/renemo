@@ -15,8 +15,6 @@ namespace nemo
 {
 
 namespace type {
-	struct x_t;
-	struct y_t;
 	class  Vector2;
 }
 

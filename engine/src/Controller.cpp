@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "Controller.hpp"
 #include "debug.hpp"
-#include "GameRoot.hpp"
+#include "constants.hpp"
 
 #include <fstream>
 #include <string>
@@ -13,7 +13,6 @@
 
 #include <boost/assign/list_of.hpp>
 #include <boost/range/adaptor/reversed.hpp>
-#include <boost/filesystem.hpp>
 #include <nlohmann/json.hpp>
 #include <magic_enum.hpp>
 
@@ -25,9 +24,9 @@ namespace nemo
 
 namespace
 {
-	// Default path to a directory for keyboard mapping files.
-	const boost::filesystem::path controller_dir_ = GameRoot::getAssetDir() 
-		/ "controller";
+	// Default path to a directory of keyboard mapping files.
+	const std::filesystem::path controller_dir_ = constants::_asset_dir / 
+		"controller";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,10 +46,10 @@ Controller::Controller()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-Controller::Controller(const boost::filesystem::path& file)
+Controller::Controller(const std::filesystem::path& file)
 	: _config_file(file)
 {
-	std::ifstream config_ifs(_config_file.string());
+	std::ifstream config_ifs(_config_file);
 
 	if (!config_ifs) {
 		STDWARN("Failed to open " << _config_file);
@@ -163,8 +162,11 @@ void
 Controller::registerKeyRelease(const key_t key)
 {
 	// Remove key from the list of pressed keys.
-	auto keys_to_rm = std::remove(_pressed_keys.begin(), _pressed_keys.end(), key);
-	_pressed_keys.erase(keys_to_rm, _pressed_keys.end());
+	const auto keys_to_remove = std::remove(
+		_pressed_keys.begin(), _pressed_keys.end(), key
+	);
+
+	_pressed_keys.erase(keys_to_remove, _pressed_keys.end());
 	STDINFO("Key " << key << " released");
 }
 
@@ -255,12 +257,12 @@ Controller::changeKeyMapping(const key_t key, const Button button)
 ////////////////////////////////////////////////////////////////////////////////
 
 bool
-Controller::saveKeyMappings(const boost::filesystem::path& file)
+Controller::saveKeyMappings(const std::filesystem::path& file)
 const
 {
-	boost::system::error_code ec;
-	boost::filesystem::create_directories(file.parent_path(), ec);
-	std::ofstream config_ofs(file.string());
+	std::error_code ec;
+	std::filesystem::create_directories(file.parent_path(), ec);
+	std::ofstream config_ofs(file);
 
 	if (!config_ofs) {
 		STDWARN("Failed to create " << file);

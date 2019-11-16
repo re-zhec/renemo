@@ -4,14 +4,12 @@
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
 #include "World/Tileset.hpp"
-#include "type/Vector2.hpp"
-#include "GameRoot.hpp"
+#include "type/RowColumnIndex.hpp"
+#include "constants.hpp"
 
 #include <sstream>
 #include <algorithm>
 #include <exception>
-
-#include <boost/filesystem.hpp>
 
 namespace nemo
 {
@@ -19,13 +17,21 @@ namespace nemo
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-Tileset::Tileset(boost::filesystem::path tilemap_file)
-{
-	tilemap_file = boost::filesystem::absolute(tilemap_file, getTilesetDir());
+namespace {
+	// Default path to a tileset directory.
+	const std::filesystem::path tileset_dir_ = constants::_sprite_dir /
+		"tileset";
+}
 
-	if (!_texture.loadFromFile(tilemap_file.string())) {
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+Tileset::Tileset(const std::filesystem::path& file)
+	: _tile_pixel_length(constants::_tile_pixel_length)
+{
+	if (!_texture.loadFromFile(file.string())) {
 		std::stringstream err_msg;
-		err_msg << "Failed to load texture from " << tilemap_file;
+		err_msg << "Failed to load texture from " << file;
 		throw std::ios_base::failure(err_msg.str());
 	}
 }
@@ -33,27 +39,24 @@ Tileset::Tileset(boost::filesystem::path tilemap_file)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-sf::Sprite
-Tileset::getSprite(const type::Vector2 idx)
-const
+void
+Tileset::setTilePixelSize(const int length)
 {
-	constexpr auto pixels_per_unit = 16;
-	
-	const sf::IntRect portion_to_crop(
-		idx.sfVector2< int >() * pixels_per_unit, 
-		{ pixels_per_unit, pixels_per_unit }
-	);
-
-	return sf::Sprite(_texture, portion_to_crop);
+	_tile_pixel_length = length;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-boost::filesystem::path
-Tileset::getTilesetDir()
+sf::Sprite
+Tileset::getTileSprite(const type::RowColumnIndex rc)
+const
 {
-	return GameRoot::getSpriteDir() / "tileset";
+	const sf::Vector2i top_left = rc.sfVector2i() * _tile_pixel_length;
+	const sf::Vector2i size = { _tile_pixel_length, _tile_pixel_length };
+	
+	const sf::IntRect portion_to_crop(top_left, size);
+	return sf::Sprite(_texture, portion_to_crop);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

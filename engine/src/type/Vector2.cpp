@@ -13,7 +13,8 @@ namespace nemo::type
 
 Vector2::Vector2(x_t x, y_t y)
 noexcept
-	: _x(x), _y(y) 
+	: _x(x)
+	, _y(y) 
 {
 }
 
@@ -64,22 +65,15 @@ noexcept
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-template< typename T >
-sf::Vector2< T >
-Vector2::sfVector2()
+sf::Vector2i
+Vector2::sfVector2i()
 const noexcept
 {
-	namespace ts = type_safe::strong_typedef_op::detail;
-	const auto x = static_cast< decltype(ts::get_underlying(_x)) >(_x);
-	const auto y = static_cast< decltype(ts::get_underlying(_y)) >(_y);
-	return { static_cast< T >(x), static_cast< T >(y) };
+	sf::Vector2i v;
+	v.x = static_cast< int >(_x);
+	v.y = static_cast< int >(_y);
+	return v;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-template sf::Vector2< int >   Vector2::sfVector2< int >()   const noexcept;
-template sf::Vector2< float > Vector2::sfVector2< float >() const noexcept;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

@@ -8,10 +8,7 @@
 #include <type_safe/strong_typedef.hpp>
 #include <SFML/System/Vector2.hpp>
 
-namespace nemo
-{
-
-namespace type
+namespace nemo::type
 {
 
 /**
@@ -19,12 +16,12 @@ namespace type
  * Strong type alias to represent a x-coordinate, width measurement, etc.
  */
 struct x_t
-	: type_safe::strong_typedef< x_t, float >
+	: type_safe::strong_typedef< x_t, int >
 	, type_safe::strong_typedef_op::equality_comparison< x_t >
-	, type_safe::strong_typedef_op::mixed_equality_comparison< x_t, float >
+	, type_safe::strong_typedef_op::mixed_equality_comparison< x_t, int >
 	, type_safe::strong_typedef_op::relational_comparison< x_t >
-	, type_safe::strong_typedef_op::mixed_relational_comparison< x_t, float >
-	, type_safe::strong_typedef_op::floating_point_arithmetic< x_t >
+	, type_safe::strong_typedef_op::mixed_relational_comparison< x_t, int >
+	, type_safe::strong_typedef_op::integer_arithmetic< x_t >
 {
 	using strong_typedef::strong_typedef;
 };
@@ -34,12 +31,12 @@ struct x_t
  * Strong type alias to represent a y-coordinate, height measurement, etc.
  */
 struct y_t
-	: type_safe::strong_typedef< y_t, float >
+	: type_safe::strong_typedef< y_t, int >
 	, type_safe::strong_typedef_op::equality_comparison< y_t >
-	, type_safe::strong_typedef_op::mixed_equality_comparison< y_t, float >
+	, type_safe::strong_typedef_op::mixed_equality_comparison< y_t, int >
 	, type_safe::strong_typedef_op::relational_comparison< y_t >
-	, type_safe::strong_typedef_op::mixed_relational_comparison< y_t, float >
-	, type_safe::strong_typedef_op::floating_point_arithmetic< y_t >
+	, type_safe::strong_typedef_op::mixed_relational_comparison< y_t, int >
+	, type_safe::strong_typedef_op::integer_arithmetic< y_t >
 {
 	using strong_typedef::strong_typedef;
 };
@@ -114,15 +111,12 @@ public:
 	noexcept;
 
 	/**
-	 * \brief  Gets a converted \link sf::Vector2 object.
+	 * \brief  Gets a converted \link sf::Vector2i object.
 	 * \return Converted object.
 	 */
-	template< typename T >
-	sf::Vector2< T >
-	sfVector2()
+	sf::Vector2i
+	sfVector2i()
 	const noexcept;
 };
 
-} // namespace type
-
-} // namespace nemo
+} // namespace nemo::type
