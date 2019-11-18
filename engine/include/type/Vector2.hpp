@@ -41,6 +41,8 @@ struct y_t
 	using strong_typedef::strong_typedef;
 };
 
+using xy_pair_t = std::pair< x_t, y_t >;
+
 /**
  * \brief
  * Represents a xy coordinate or dimensions on a 2D plane.
@@ -52,12 +54,27 @@ public:
 	y_t _y; /// Y-coordinate / height.
 
 	/**
+	 * \brief
+	 * Constructs a 2D value of (0, 0).
+	 */
+	constexpr
+	Vector2()
+	noexcept;
+
+	/**
 	 * \brief     Constructs a 2D value.
 	 * 
 	 * \param x   X component.
 	 * \param y   Y component.
 	 */
-	Vector2(x_t x, y_t y)
+	Vector2(const x_t x, const y_t y)
+	noexcept;
+	
+	/**
+	 * \brief       Constructs a 2D value.
+	 * \param xy    (1) X and (2) Y components.
+	 */
+	Vector2(const xy_pair_t xy)
 	noexcept;
 	
 	/**

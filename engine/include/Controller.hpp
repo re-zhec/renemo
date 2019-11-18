@@ -5,14 +5,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <optional>
-#include <vector>
-#include <filesystem>
-
+#include <SFML/Window/Keyboard.hpp>
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
 #include <boost/bimap/list_of.hpp>
-#include <SFML/Window/Keyboard.hpp>
+
+#include <optional>
+#include <vector>
+#include <filesystem>
 
 namespace nemo
 {
@@ -107,9 +107,9 @@ public:
 	 * \param file
 	 * Path to the keyboard mapping file.
 	 * 
-	 * The keyboard mapping file is a json, where each property is a control and
-	 * its value is an integer that identifies a keyboard key. This is an 
-	 * example of a valid keyboard mapping json:
+	 * The keyboard mapping file is a json, where each property's key is a 
+	 * control and the property's value is an integer that identifies a keyboard 
+	 * key. This is an example of a valid keyboard mapping json:
 	 * 
 	 * \code
 	 * {

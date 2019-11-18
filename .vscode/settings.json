@@ -92,6 +92,7 @@
 		"valarray": "cpp",
 		"unordered_set": "cpp",
 		"regex": "cpp",
-		"bit": "cpp"
+		"bit": "cpp",
+		"filesystem": "cpp"
 	}
 }

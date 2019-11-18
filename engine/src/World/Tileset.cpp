@@ -27,7 +27,7 @@ namespace {
 ////////////////////////////////////////////////////////////////////////////////
 
 Tileset::Tileset(const std::filesystem::path& file)
-	: _tile_pixel_length(constants::_tile_pixel_length)
+	: _tile_side_length(constants::_tile_side_length)
 {
 	if (!_texture.loadFromFile(file.string())) {
 		std::stringstream err_msg;
@@ -42,7 +42,7 @@ Tileset::Tileset(const std::filesystem::path& file)
 void
 Tileset::setTilePixelSize(const int length)
 {
-	_tile_pixel_length = length;
+	_tile_side_length = length;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,8 +52,8 @@ sf::Sprite
 Tileset::getTileSprite(const type::RowColumnIndex rc)
 const
 {
-	const sf::Vector2i top_left = rc.sfVector2i() * _tile_pixel_length;
-	const sf::Vector2i size = { _tile_pixel_length, _tile_pixel_length };
+	const sf::Vector2i top_left = rc.sfVector2i() * _tile_side_length;
+	const sf::Vector2i size = { _tile_side_length, _tile_side_length };
 	
 	const sf::IntRect portion_to_crop(top_left, size);
 	return sf::Sprite(_texture, portion_to_crop);
@@ -79,13 +79,12 @@ ForestTilemap::ForestTilemap()
 ////////////////////////////////////////////////////////////////////////////////
 
 std::unique_ptr< Tileset >
-makeTileset(const TilesetType type)
+makeTileset(const std::string_view& type)
 {
-	switch (type) {
-		case TilesetType::Urban:
+	if (type == "urban") {
 		return std::make_unique< UrbanTilemap >();
-
-		case TilesetType::Forest:
+	}
+	else if (type == "forest") {
 		return std::make_unique< ForestTilemap >();
 	}
 

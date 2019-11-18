@@ -5,11 +5,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <memory>
-#include <filesystem>
-
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
+
+#include <memory>
+#include <filesystem>
+#include <string_view>
 
 namespace nemo
 {
@@ -52,7 +53,7 @@ public:
 	/**
 	 * \brief
 	 * 
-	 * \param rc
+	 * \param index
 	 * Row and column the tile is located in the tileset image.
 	 * 
 	 * \throw
@@ -60,12 +61,12 @@ public:
 	 * reasons.
 	 */
 	sf::Sprite
-	getTileSprite(const type::RowColumnIndex rc)
+	getTileSprite(const type::RowColumnIndex index)
 	const;
 
 private:
 	sf::Texture _texture;
-	int         _tile_pixel_length;
+	int         _tile_side_length;
 };
 
 /**
@@ -97,6 +98,6 @@ public:
  * Tileset.
  */
 std::unique_ptr< Tileset >
-makeTileset(const TilesetType type);
+makeTileset(const std::string_view& type);
 
 } // namespace nemo

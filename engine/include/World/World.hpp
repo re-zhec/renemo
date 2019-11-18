@@ -5,17 +5,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <memory>
-#include <unordered_map>
-
 #include <boost/multi_array.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+
+#include <memory>
+#include <unordered_map>
+#include <filesystem>
+#include <string_view>
 
 namespace nemo
 {
 
 namespace type {
-	class  Vector2;
+	class RowColumnIndex;
 }
 
 class Tile;
@@ -34,28 +36,44 @@ public:
 	/**
 	 * \brief
 	 */
-	void
-	resetToSize(type::Vector2 size)
-	noexcept;
+	World(const std::filesystem::path& file);
 
 	/**
 	 * \brief
 	 */
-	void
-	setTileset(const TilesetType type);
+	Tile&
+	getTile(const type::RowColumnIndex world_index);
 
 	/**
 	 * \brief
 	 */
-	void
-	drawWorld(sf::RenderWindow& window)
+	const Tile&
+	getTile(const type::RowColumnIndex world_index)
 	const;
 
+	/**
+	 * \brief
+	 */
+	void
+	setTileset(const std::string_view& type);
+
 private:
-	using tile_array_t = boost::multi_array< std::shared_ptr<Tile>, 2 >;
+	using tile_array_t = boost::multi_array< Tile, 2 >;
 	
+	/**
+	 * \brief
+	 */
+	void
+	resetToSize(const type::RowColumnIndex num_tiles);
+
 	tile_array_t               _tiles;
 	std::shared_ptr< Tileset > _tileset;
+};
+
+class TutorialWorld : public World
+{
+public:
+	TutorialWorld();
 };
 
 } // namespace nemo

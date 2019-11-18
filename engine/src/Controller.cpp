@@ -4,17 +4,18 @@
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
 #include "Controller.hpp"
-#include "debug.hpp"
+#include "util/readJsonFile.hpp"
+#include "util/debug.hpp"
 #include "constants.hpp"
+
+#include <nlohmann/json.hpp>
+#include <magic_enum.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/range/adaptor/reversed.hpp>
 
 #include <fstream>
 #include <string>
 #include <algorithm>
-
-#include <boost/assign/list_of.hpp>
-#include <boost/range/adaptor/reversed.hpp>
-#include <nlohmann/json.hpp>
-#include <magic_enum.hpp>
 
 namespace nemo
 {
@@ -49,32 +50,22 @@ Controller::Controller()
 Controller::Controller(const std::filesystem::path& file)
 	: _config_file(file)
 {
-	std::ifstream config_ifs(_config_file);
+	const std::optional< nlohmann::json > 
+		config = util::readJsonFile(_config_file);
 
-	if (!config_ifs) {
-		STDWARN("Failed to open " << _config_file);
-		useDefaultKeyMappings();
-		return;
-	}
-
-	nlohmann::json config;
-	
-	try {
-		config = nlohmann::json::parse(config_ifs);
-	} 
-	catch (const nlohmann::json::parse_error& e) {
-		STDWARN("Parse error in " << _config_file);
+	if (!config) {
+		STDWARN("Failed to read controller config file " << _config_file);
 		useDefaultKeyMappings();
 		return;
 	}
 		
-	for (const auto& [button_field, keycode] : config.items()) {
+	for (const auto& [button_field, keycode] : config->items()) {
 		// Warning message to issue should this particular mapping fails.
 		const auto warn_skipped_mapping = [b = &button_field, k = keycode] () {
 			STDWARN("Skipped mapping [" << b << "] to key " << k);
 		};
 
-		// Identify controller button from json property name.
+		// Identify controller button from json property's key name.
 		const auto button = magic_enum::enum_cast< Button >(button_field);
 
 		if (!button) {
@@ -151,7 +142,7 @@ Controller::registerKeyPress(const key_t key)
 	)) {
 		// Newly pressed key.
 		_pressed_keys.push_back(key);
-		STDINFO("Key " << key << " pressed");
+		STDDEBUG("Key " << key << " pressed");
 	}
 }
 
@@ -167,7 +158,7 @@ Controller::registerKeyRelease(const key_t key)
 	);
 
 	_pressed_keys.erase(keys_to_remove, _pressed_keys.end());
-	STDINFO("Key " << key << " released");
+	STDDEBUG("Key " << key << " released");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -272,7 +263,7 @@ const
 	nlohmann::json config;
 
 	for (const auto& [key, button] : _key_mappings.right) {
-		// Use the controller input's name as the json property name.
+		// Use the controller input's name as the json property's key.
 		const auto button_field = std::string(magic_enum::enum_name(button));
 		config[button_field] = key;
 	}

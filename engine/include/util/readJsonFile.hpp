@@ -5,17 +5,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "World/World.hpp"
+#include <nlohmann/json.hpp>
 
-namespace nemo
-{
+#include <filesystem>
+#include <optional>
 
-class TutorialWorld : public World
+namespace nemo::util
 {
 	/**
 	 * \brief
 	 */
-	TutorialWorld();
-};
-
-} // namespace nemo
+	std::optional< nlohmann::json >
+	readJsonFile(const std::filesystem::path& file);
+}
