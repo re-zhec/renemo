@@ -3,30 +3,36 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-#include "Entity/Npc/NpcInput.hpp"
-#include "Entity/Entity.hpp"
+#include "entity/sprite/TeenageBoy.hpp"
+#include "entity/Entity.hpp"
+#include "constants.hpp"
 
-namespace nemo
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Color.hpp>
+
+namespace nemo::sprite
 {
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-NpcInput::NpcInput()
-{
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 void
-NpcInput::updateObjectAction(Entity& obj)
+TeenageBoy::displayEntity(sf::RenderWindow& window, const Entity& entity)
 const
 {
+	const type::Vector2 position = entity.position();
 	
+	sf::RectangleShape graphics;
+	graphics.setPosition(position.sfVector2< float >());
+	graphics.setFillColor(sf::Color::Red);
+	graphics.setSize({ 
+		constants::_tile_side_length, constants::_tile_side_length
+	});
+	
+	window.draw(graphics);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-} // namespace nemo
+} 

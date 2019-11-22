@@ -52,7 +52,7 @@ sf::Sprite
 Tileset::getTileSprite(const type::RowColumnIndex rc)
 const
 {
-	const sf::Vector2i top_left = rc.sfVector2i() * _tile_side_length;
+	const sf::Vector2i top_left = rc.sfVector2< int >() * _tile_side_length;
 	const sf::Vector2i size = { _tile_side_length, _tile_side_length };
 	
 	const sf::IntRect portion_to_crop(top_left, size);
@@ -94,4 +94,4 @@ makeTileset(const std::string_view& type)
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-} // namespace nemo
+} 

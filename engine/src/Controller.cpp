@@ -11,11 +11,11 @@
 #include <nlohmann/json.hpp>
 #include <magic_enum.hpp>
 #include <boost/assign/list_of.hpp>
-#include <boost/range/adaptor/reversed.hpp>
 
 #include <fstream>
 #include <string>
 #include <algorithm>
+#include <vector>
 
 namespace nemo
 {
@@ -33,7 +33,7 @@ namespace
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-std::vector< Controller::key_t >
+std::deque< Controller::key_t >
 Controller::_pressed_keys = {};
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -135,15 +135,17 @@ Controller::useDefaultKeyMappings()
 void
 Controller::registerKeyPress(const key_t key)
 {
-	// Avoid adding a key already being pressed to the list of pressed keys.
-	if (std::none_of(
+	if (std::any_of(
 		_pressed_keys.cbegin(), _pressed_keys.cend(), 
 		[key] (const key_t p) { return p == key; }
 	)) {
-		// Newly pressed key.
-		_pressed_keys.push_back(key);
-		STDDEBUG("Key " << key << " pressed");
+		// Avoid adding a key already being pressed to the list of pressed keys.
+		return;
 	}
+
+	// Newly pressed key.
+	_pressed_keys.push_front(key);
+	STDDEBUG("Key " << key << " pressed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,7 +167,7 @@ Controller::registerKeyRelease(const key_t key)
 ////////////////////////////////////////////////////////////////////////////////
 
 std::optional< Button >
-Controller::getPressedDirection()
+Controller::pressedDirection()
 const
 {
 	const static std::vector< Button > limit_buttons_to = { 
@@ -173,14 +175,14 @@ const
 	};
 
 	// Limit the query to directional buttons only.
-	return getPressedButton(limit_buttons_to);
+	return pressedButton(limit_buttons_to);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 std::optional< Button >
-Controller::getPressedSelection()
+Controller::pressedSelection()
 const
 {
 	const static std::vector< Button > limit_buttons_to = { 
@@ -188,21 +190,21 @@ const
 	};
 
 	// Limit the query to selection buttons only.
-	return getPressedButton(limit_buttons_to);
+	return pressedButton(limit_buttons_to);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 std::optional< Button >
-Controller::getPressedButton(const std::vector< Button > button_filters)
+Controller::pressedButton(const std::vector< Button > button_filters)
 const
 {
-	// Iterating in reverse order priortizes more recently pressed keys. If the
-	// up button is pressed while the left button is still pressed, for example,
-	// the up button will be used instead of the left button as long as both 
-	// buttons are held (assuming we're looking for any directional input).
-	for (const key_t k : boost::adaptors::reverse(_pressed_keys)) {
+	// Prioritize more recently pressed keys. If the up button is pressed while 
+	// the left button is still pressed, for example, the up button will be used 
+	// instead of the left button as long as both buttons are held (assuming 
+	// we're looking for any directional input).
+	for (const key_t k : _pressed_keys) {
 		const auto key_to_button = _key_mappings.left.find(k);
 		
 		if (key_to_button == _key_mappings.left.end()) {
@@ -222,6 +224,9 @@ const
 			// buttons we are looking for.
 			continue;
 		}
+
+		const auto button_field = magic_enum::enum_name(button);
+		STDDEBUG("Found [" << button_field << "] being pressed.");
 
 		return button;
 	}
@@ -311,4 +316,4 @@ EnemyController::EnemyController()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-} // namespace nemo
+} 

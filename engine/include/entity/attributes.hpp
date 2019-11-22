@@ -5,32 +5,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Entity/EntityInput.hpp"
+#include "constants.hpp"
 
-namespace nemo
+namespace nemo::attr
 {
 
 /**
- * \brief 
+ * \brief
+ * Speed at which an entity can move, in pixels per frame.
  */
-class NpcInput : public EntityInput
+struct MovementSpeed
 {
-public:
-	/**
-	 * \brief
-	 */
-	NpcInput();
-
-	/**
-	 * \brief Controls player action on the overworld map.
-	 */
-	virtual void
-	updateObjectAction(Entity& obj)
-	const override;
-
-private:
-	/// NPC's moving speed.
-	constexpr static float _moving_speed = 2.0f;
+	int _walking = constants::_walking_speed; /// Walking speed.
+	int _running = constants::_running_speed; /// Running speed.
 };
 
-} // namespace nemo
+}

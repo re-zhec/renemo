@@ -3,20 +3,22 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-#include "Entity/Npc/NpcPhysics.hpp"
-#include "Entity/Entity.hpp"
+#pragma once
 
-namespace nemo
+#include "EntitySprite.hpp"
+
+namespace nemo::sprite
 {
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-void
-NpcPhysics::updateObjectInteraction(Entity& obj)
-const
+/**
+ * \brief 
+ */
+class Hero : public EntitySprite
 {
-	obj.goToNewPosition();
+public:
+	virtual void
+	displayEntity(sf::RenderWindow& window, const Entity& entity)
+	const override;
+};
+
 }
-
-} // namespace nemo

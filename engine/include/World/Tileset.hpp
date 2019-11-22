@@ -100,4 +100,4 @@ public:
 std::unique_ptr< Tileset >
 makeTileset(const std::string_view& type);
 
-} // namespace nemo
+} 

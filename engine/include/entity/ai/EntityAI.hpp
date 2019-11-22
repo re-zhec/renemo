@@ -5,33 +5,33 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Entity.hpp"
-#include "Npc/PlayerInput.hpp"
-#include "Npc/NpcInput.hpp"
-#include "Npc/NpcPhysics.hpp"
-#include "Npc/NpcGraphics.hpp"
-
 #include <memory>
 
-namespace nemo
+namespace nemo {
+	class Entity; // Forward declaration.
+}
+
+namespace nemo::ai
 {
 
-class Entity;
-
-class EntityCreator
+/**
+ * \brief
+ * Artificial intelligence that decides an entity's action.
+ */
+class EntityAI
 {
 public:
+	virtual 
+	~EntityAI() = default;
+	
 	/**
-	 * \return A character on the overworld map.
+	 * \brief           Commits an entity to an action.
+	 * \param entity    Entity.
 	 */
-	static std::unique_ptr< Entity >
-	npc();
-
-	/**
-	 * \return A playable character on the overworld map.
-	 */
-	static std::unique_ptr< Entity >
-	player();
+	virtual void
+	commitAction(Entity& entity) = 0;
 };
 
-} // namespace nemo
+using entity_ai_uptr_t = std::unique_ptr< EntityAI >;
+
+}

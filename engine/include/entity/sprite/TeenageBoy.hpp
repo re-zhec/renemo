@@ -5,22 +5,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Entity/EntityGraphics.hpp"
+#include "EntitySprite.hpp"
 
-namespace nemo
+namespace nemo::sprite
 {
 
 /**
  * \brief 
  */
-class NpcGraphics : public EntityGraphics
+class TeenageBoy : public EntitySprite
 {
 public:
 	virtual void
-	updateObjectDisplay(Entity& obj, sf::RenderWindow& window)
+	displayEntity(sf::RenderWindow& window, const Entity& entity)
 	const override;
-
-private:
 };
 
-} // namespace nemo
+}

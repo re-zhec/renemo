@@ -5,38 +5,40 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "Entity/EntityInput.hpp"
+#include "EntityAI.hpp"
 #include "Controller.hpp"
 
 #include <memory>
 
-namespace nemo
+namespace nemo::ai
 {
 
 /**
- * \brief 
+ * \brief
+ * Allows player to control an entity's action.
  */
-class PlayerInput : public EntityInput
+class Player : public EntityAI
 {
 public:
 	/**
 	 * \brief
+	 * Constructs player input handler for an entity.
 	 */
-	PlayerInput();
+	Player();
 
 	/**
-	 * \brief Controls player action on the overworld map.
+	 * \brief
+	 * Commits an entity to an action.
+	 * 
+	 * \param entity
+	 * Game entity.
 	 */
 	virtual void
-	updateObjectAction(Entity& obj)
-	const override;
+	commitAction(Entity& entity)
+	override;
 
 private:
-	/// Player controller.
-	std::unique_ptr< Controller > _controller;
-
-	/// Player's moving speed.
-	constexpr static float _moving_speed = 2.0f;
+	std::unique_ptr< Controller > _controller; /// Player controller.
 };
 
 }

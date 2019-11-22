@@ -3,8 +3,9 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-#include "Entity/Npc/PlayerInput.hpp"
-#include "Entity/Entity.hpp"
+#include "Camera.hpp"
+#include "World/World.hpp"
+#include "entity/Entity.hpp"
 
 namespace nemo
 {
@@ -12,8 +13,8 @@ namespace nemo
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-PlayerInput::PlayerInput()
-	: _controller(std::make_unique< PlayerController >())
+Camera::Camera(const type::Vector2 size)
+	: _size(size)
 {
 }
 
@@ -21,33 +22,36 @@ PlayerInput::PlayerInput()
 ////////////////////////////////////////////////////////////////////////////////
 
 void
-PlayerInput::updateObjectAction(Entity& obj)
-const
+Camera::setCenter(const Entity& entity)
+noexcept
 {
-	switch (_controller->getPressedSelection().value_or(Button::Left)) {
-		case Button::Cancel:
-		break;
-
-		case Button::Select:
-		break;
-
-		case Button::Pause:
-		break;
-
-		default:
-		break;
-	}
-
-	switch (_controller->getPressedDirection().value_or(Button::Cancel)) {
-		case Button::Left:  obj.setToGoLeft (_moving_speed); break;
-		case Button::Up:    obj.setToGoUp   (_moving_speed); break;
-		case Button::Right: obj.setToGoRight(_moving_speed); break;
-		case Button::Down:  obj.setToGoDown (_moving_speed); break;
-		default:            obj.stopMoving();                break;
-	}
+	_position = entity.position();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-} // namespace nemo
+void
+Camera::moveBy(const type::Vector2 velocity)
+noexcept
+{
+	_position += velocity;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+void
+Camera::drawView(
+	sf::RenderWindow&            window, 
+	const World&                 world,
+	const std::vector< Entity >& entities
+) const
+{
+	
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+} 

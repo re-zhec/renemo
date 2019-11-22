@@ -11,7 +11,7 @@
 #include <boost/bimap/list_of.hpp>
 
 #include <optional>
-#include <vector>
+#include <deque>
 #include <filesystem>
 
 namespace nemo
@@ -73,11 +73,11 @@ enum class Button
  * 			break;
  * 		}
  *    	
- * 		if (!controller->getPressedButton()) {
+ * 		if (!controller->pressedButton()) {
  * 			continue;
  * 		}
  * 
- * 		switch (*controller->getPressedButton()) {
+ * 		switch (*controller->pressedButton()) {
  * 			case Button::left:
  * 			// move left
  * 			break;
@@ -206,7 +206,7 @@ public:
 	 * Directional input, if any.
 	 */
 	std::optional< Button >
-	getPressedDirection()
+	pressedDirection()
 	const;
 
 	/**
@@ -226,7 +226,7 @@ public:
 	 * Selection input, if any.
 	 */
 	std::optional< Button >
-	getPressedSelection()
+	pressedSelection()
 	const;
 
 	/**
@@ -239,8 +239,8 @@ public:
 	 * If \a button_filters is empty or not used, then this method will return 
 	 * any control that is mapped to the keys currently pressed. Otherwise, it 
 	 * will return one of the controls in the filter list. This is a more 
-	 * customized query than \link getPressedDirection and \link 
-	 * getPressedSelection.
+	 * customized query than \link pressedDirection and \link 
+	 * pressedSelection.
 	 * 
 	 * If more than one of the keys mapped to the requested controls are 
 	 * currently pressed, then this method will return the control corresponding
@@ -251,7 +251,7 @@ public:
 	 * Controller input among \a button_filters, if any.
 	 */
 	std::optional< Button >
-	getPressedButton(const std::vector< Button > button_filters = {})
+	pressedButton(const std::vector< Button > button_filters = {})
 	const;
 	
 	/**
@@ -342,13 +342,13 @@ private:
 	useDefaultKeyMappings();	
 
 	/// Path to controller's keyboard mapping file.
-	std::filesystem::path       _config_file;
+	std::filesystem::path      _config_file;
 
 	/// Bidrectional key-to-control mappings.
-	keyboard_to_controller_t    _key_mappings;
+	keyboard_to_controller_t   _key_mappings;
 
 	/// Keyboard keys the player is currently pressing.
-	static std::vector< key_t > _pressed_keys;
+	static std::deque< key_t > _pressed_keys;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -400,4 +400,4 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-} // namespace nemo
+} 

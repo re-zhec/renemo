@@ -5,19 +5,29 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-namespace nemo
+#include <SFML/Graphics/RenderWindow.hpp>
+
+namespace nemo {
+	class Entity; // Forward declaration.
+}
+
+namespace nemo::sprite
 {
 
-class Entity;
-
-class EntityInput
+class EntitySprite
 {
 public:
-	virtual ~EntityInput() = default;
-	
+	virtual
+	~EntitySprite() = default;
+
+	/**
+	 * \brief
+	 */
 	virtual void
-	updateObjectAction(Entity& obj)
+	displayEntity(sf::RenderWindow& window, const Entity& entity)
 	const = 0;
 };
 
-} // namespace nemo
+using entity_sprite_uptr_t = std::unique_ptr< EntitySprite >;
+
+}

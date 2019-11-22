@@ -3,39 +3,36 @@
 /// \author    Caylen Lee                                                    ///
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
-#include "Entity/EntityCreator.hpp"
-#include "Entity/Entity.hpp"
+#include "entity/sprite/Hero.hpp"
+#include "entity/Entity.hpp"
+#include "constants.hpp"
 
-namespace nemo
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Color.hpp>
+
+namespace nemo::sprite
 {
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-std::unique_ptr< Entity >
-EntityCreator::npc()
+void
+Hero::displayEntity(sf::RenderWindow& window, const Entity& entity)
+const
 {
-	return std::make_unique< Entity >(
-		std::make_unique< NpcInput >(),
-		std::make_unique< NpcPhysics >(),
-		std::make_unique< NpcGraphics >()
-	);
+	const type::Vector2 position = entity.position();
+	
+	sf::RectangleShape graphics;
+	graphics.setPosition(position.sfVector2< float >());
+	graphics.setFillColor(sf::Color::Yellow);
+	graphics.setSize({ 
+		constants::_tile_side_length, constants::_tile_side_length
+	});
+	
+	window.draw(graphics);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-std::unique_ptr< Entity >
-EntityCreator::player()
-{
-	return std::make_unique< Entity >(
-		std::make_unique< PlayerInput >(),
-		std::make_unique< NpcPhysics >(),
-		std::make_unique< NpcGraphics >()
-	);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-} // namespace nemo
+} 

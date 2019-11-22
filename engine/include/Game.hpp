@@ -5,12 +5,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "entity/Entity.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 
 namespace nemo
 {
-
-class Entity;
 
 /**
  * \brief Game
@@ -61,4 +60,4 @@ private:
 	std::unique_ptr< Entity > _npc;
 };
 
-} // namespace nemo
+} 

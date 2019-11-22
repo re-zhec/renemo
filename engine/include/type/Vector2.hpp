@@ -59,7 +59,7 @@ public:
 	 */
 	constexpr
 	Vector2()
-	noexcept;
+	noexcept {};
 
 	/**
 	 * \brief     Constructs a 2D value.
@@ -128,12 +128,13 @@ public:
 	noexcept;
 
 	/**
-	 * \brief  Gets a converted \link sf::Vector2i object.
+	 * \brief  Gets a converted \link sf::Vector2 object.
 	 * \return Converted object.
 	 */
-	sf::Vector2i
-	sfVector2i()
+	template< typename T >
+	sf::Vector2< T >
+	sfVector2()
 	const noexcept;
 };
 
-} // namespace nemo::type
+} 

@@ -5,21 +5,37 @@
 ////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <SFML/Graphics/RenderWindow.hpp>
+#include <memory>
 
 namespace nemo
 {
 
 class Entity;
 
-class EntityGraphics
+/**
+ * \brief
+ * Enumeration identifiers used for generating entity objects.
+ */
+enum class EntityID
 {
-public:
-	virtual ~EntityGraphics() = default;
-
-	virtual void
-	updateObjectDisplay(Entity& obj, sf::RenderWindow& window)
-	const = 0;
+	Hero,       /// Hero character.
+	TeenageBoy, /// Generic teenage boy.
 };
 
-} // namespace nemo
+class EntityMake
+{
+public:
+	using entity_ptr_t = std::unique_ptr< Entity >;
+	EntityMake() = delete;
+
+	static entity_ptr_t
+	entity(const EntityID what);
+
+	static entity_ptr_t
+	hero();
+
+	static entity_ptr_t
+	teenageBoy();
+};
+
+}
