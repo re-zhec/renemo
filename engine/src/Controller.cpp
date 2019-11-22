@@ -54,22 +54,26 @@ Controller::Controller(const std::filesystem::path& file)
 		config = util::readJsonFile(_config_file);
 
 	if (!config) {
-		STDWARN("Failed to read controller config file " << _config_file);
+		OBJ_STDWARN("Failed to read controller config file " << _config_file);
 		useDefaultKeyMappings();
 		return;
 	}
 		
 	for (const auto& [button_field, keycode] : config->items()) {
 		// Warning message to issue should this particular mapping fails.
-		const auto warn_skipped_mapping = [b = &button_field, k = keycode] () {
-			STDWARN("Skipped mapping [" << b << "] to key " << k);
+		const auto warn_skipped_mapping = 
+			[this, b = &button_field, k = keycode] () {
+			OBJ_STDWARN(
+				"Skipped mapping [" << b << "] to key " << k << " in " << 
+				_config_file
+			); 
 		};
 
 		// Identify controller button from json property's key name.
 		const auto button = magic_enum::enum_cast< Button >(button_field);
 
 		if (!button) {
-			STDWARN("Unknown control found: [" << button_field << "]");
+			OBJ_STDWARN("Unknown control found: [" << button_field << "]");
 			warn_skipped_mapping();
 			continue;
 		}
@@ -78,7 +82,7 @@ Controller::Controller(const std::filesystem::path& file)
 		const auto key = magic_enum::enum_cast< key_t >(keycode);
 		
 		if (!key) {
-			STDWARN("Invalid key: " << keycode);
+			OBJ_STDWARN("Invalid key found: " << keycode);
 			warn_skipped_mapping();
 			continue;
 		}
@@ -88,12 +92,12 @@ Controller::Controller(const std::filesystem::path& file)
 	}
 
 	if (!isValidController()) {
-		STDWARN("Incomplete/missing mapping(s) in " << _config_file);
+		OBJ_STDWARN("Incomplete mapping(s) in " << _config_file);
 		useDefaultKeyMappings();
 		return;
 	}
 
-	STDINFO("Loaded " << _config_file << " config for controller " << this);
+	OBJ_STDINFO("Used keyboard mapping config from " << _config_file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +118,7 @@ Controller::~Controller()
 void
 Controller::useDefaultKeyMappings()
 {
-	STDINFO("Used default key mapping for controller " << this);
+	OBJ_STDINFO("Used default keyboard mapping for controller");
 
 	changeKeyMapping(key_t::A,     Button::Left  );
 	changeKeyMapping(key_t::W,     Button::Up    );
@@ -125,7 +129,7 @@ Controller::useDefaultKeyMappings()
 	changeKeyMapping(key_t::Enter, Button::Select);
 
 	if (!isValidController()) {
-		STDERR("Default key mapping needs to change");
+		STDERR("Default keyboard mapping needs to change");
 	}
 }
 
@@ -226,7 +230,7 @@ const
 		}
 
 		const auto button_field = magic_enum::enum_name(button);
-		STDDEBUG("Found [" << button_field << "] being pressed.");
+		OBJ_STDDEBUG("Found [" << button_field << "] being pressed.");
 
 		return button;
 	}
@@ -261,7 +265,7 @@ const
 	std::ofstream config_ofs(file);
 
 	if (!config_ofs) {
-		STDWARN("Failed to create " << file);
+		OBJ_STDWARN("Failed to create " << file);
 		return false;
 	}
 
@@ -277,11 +281,11 @@ const
 	config_ofs << config.dump(4);
 
 	if (!config_ofs) {
-		STDWARN("Write error in " << file);
+		OBJ_STDWARN("Write error in " << file);
 		return false;
 	}
 
-	STDINFO("Saved controller " << this << " settings to " << file);
+	OBJ_STDINFO("Saved settings to " << file);
 	return true;
 }
 
