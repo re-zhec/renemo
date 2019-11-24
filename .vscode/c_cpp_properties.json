@@ -7,8 +7,9 @@
 				"${workspaceFolder}/engine/type_safe/include",
 				"${workspaceFolder}/engine/json/single_include",
 				"${workspaceFolder}/engine/magic_enum/include",
+				"${workspaceFolder}/engine/spdlog/include",
 				"C:/SFML/include",
-				"C:/MinGW/include/c++/8.2.0",
+				"C:/MinGW/include/c++/9.1.0",
 				"C:/MinGW/include"
 			],
 			"compilerPath": "C:/MinGW/bin/g++",

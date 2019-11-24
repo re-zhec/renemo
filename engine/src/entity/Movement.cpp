@@ -6,7 +6,7 @@
 #include "entity/Movement.hpp"
 #include "entity/Entity.hpp"
 #include "type/Vector2.hpp"
-#include "util/debug.hpp"
+#include "util/logger.hpp"
 
 #include <string_view>
 
@@ -20,7 +20,10 @@ namespace
 {
 	const auto log_movement_ = 
 		[] (const Entity& e, const int speed, const std::string_view& dir) {
-		STDDEBUG(std::addressof(e) << " moved " << dir << " " << speed);
+		// NEMO_DEBUG(
+		// 	"Moved {} {} {}", 
+		// 	static_cast< void* >(std::addressof(e)), dir, speed
+		// );
 	};
 }
 

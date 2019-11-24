@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "Game.hpp"
 #include "entity/EntityMake.hpp"
-#include "util/debug.hpp"
+#include "util/logger.hpp"
 
 namespace nemo
 {
@@ -37,7 +37,7 @@ void
 Game::pause()
 noexcept
 {
-	STDDEBUG("Game paused");
+	NEMO_DEBUG("Game paused");
 	_is_playing = false;
 }
 
@@ -48,7 +48,7 @@ void
 Game::resume()
 noexcept
 {
-	STDDEBUG("Game resumed");
+	NEMO_DEBUG("Game resumed");
 	_is_playing = true;
 }
 

@@ -8,7 +8,7 @@
 #include "World/Tile.hpp"
 #include "type/RowColumnIndex.hpp"
 #include "util/readJsonFile.hpp"
-#include "util/debug.hpp"
+#include "util/logger.hpp"
 #include "constants.hpp"
 
 #include <algorithm>
@@ -34,7 +34,7 @@ namespace
 World::World(const std::filesystem::path& file)
 {
 	const auto error_parse_failure = [&file] () {
-		STDERR("Failed to load world map " << file);
+		NEMO_ERROR("Failed to load world map {}", file);
 	};
 
 	const std::optional< nlohmann::json > config = util::readJsonFile(file);

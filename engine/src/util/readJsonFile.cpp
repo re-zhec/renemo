@@ -4,7 +4,7 @@
 /// \date      2019                                                          ///
 ////////////////////////////////////////////////////////////////////////////////
 #include "util/readJsonFile.hpp"
-#include "util/debug.hpp"
+#include "util/logger.hpp"
 
 #include <fstream>
 
@@ -27,17 +27,15 @@ readJsonFile(const std::filesystem::path& file)
 		json = nlohmann::json::parse(ifs);
 	}
 	catch (const nlohmann::json::parse_error& e) {
-		STDERR("Parse json error in " << file);
-		STDERR(e.what());
+		NEMO_ERROR("Parse json error in {}: {}", file, e.what());
 		return {};
 	}
 	catch (const std::ios_base::failure& e) {
-		STDERR("Read I/O failure in " << file);
-		STDERR(e.what() << " : " << e.code());
+		NEMO_ERROR("Read I/O failure in {}: {} | {}", file, e.what(), e.code());
 		return {};
 	}
 	catch (...) {
-		STDERR("Unknown failure in " << file);
+		NEMO_ERROR("Unknown failure in {}", file);
 		return {};
 	}
 

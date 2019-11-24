@@ -7,3 +7,6 @@
 [submodule "engine/magic_enum"]
 	path = engine/magic_enum
 	url = https://github.com/Neargye/magic_enum
+[submodule "engine/spdlog"]
+	path = engine/spdlog
+	url = https://github.com/gabime/spdlog

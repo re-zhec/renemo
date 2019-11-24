@@ -13,6 +13,7 @@ CPPFLAGS += -Iengine/json/single_include
 CPPFLAGS += -Iengine/type_safe/include
 CPPFLAGS += -Iengine/type_safe/external/debug_assert
 CPPFLAGS += -Iengine/magic_enum/include
+CPPFLAGS += -Iengine/spdlog/include
 
 CPPFLAGS += -IC:/SFML/include
 CPPFLAGS += -IC:/MinGW/include
@@ -25,7 +26,7 @@ LDFLAGS := -LC:MinGW/lib/
 LDFLAGS += -LC:/SFML/lib
 
 LDLIBS := -lsfml-graphics-s -lsfml-window-s -lsfml-system-s
-LDLIBS += -lopengl32 -lwinmm -lgdi32 -lfreetype -lboost_filesystem
+LDLIBS += -lopengl32 -lwinmm -lgdi32 -lfreetype
 
 .PHONY: all clean
 

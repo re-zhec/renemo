@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "Controller.hpp"
 #include "util/readJsonFile.hpp"
-#include "util/debug.hpp"
+#include "util/logger.hpp"
 #include "constants.hpp"
 
 #include <nlohmann/json.hpp>
@@ -54,27 +54,24 @@ Controller::Controller(const std::filesystem::path& file)
 		config = util::readJsonFile(_config_file);
 
 	if (!config) {
-		OBJ_STDWARN("Failed to read controller config file " << _config_file);
+		NEMO_WARN("Failed reading controller file {}", _config_file);
 		useDefaultKeyMappings();
 		return;
 	}
+
+	// Warning message to issue should a particular mapping fails.
+	const auto warn_skipped_mapping = 
+		[f = _config_file] (const std::string& but, const int key) {
+			NEMO_WARN("Skipped [{}] -> key {} mapping in {}", but, key, f);
+	};
 		
 	for (const auto& [button_field, keycode] : config->items()) {
-		// Warning message to issue should this particular mapping fails.
-		const auto warn_skipped_mapping = 
-			[this, b = &button_field, k = keycode] () {
-			OBJ_STDWARN(
-				"Skipped mapping [" << b << "] to key " << k << " in " << 
-				_config_file
-			); 
-		};
-
 		// Identify controller button from json property's key name.
 		const auto button = magic_enum::enum_cast< Button >(button_field);
 
 		if (!button) {
-			OBJ_STDWARN("Unknown control found: [" << button_field << "]");
-			warn_skipped_mapping();
+			NEMO_WARN("Unknown control [{}] in {}", button_field, _config_file);
+			warn_skipped_mapping(button_field, keycode);
 			continue;
 		}
 
@@ -82,8 +79,8 @@ Controller::Controller(const std::filesystem::path& file)
 		const auto key = magic_enum::enum_cast< key_t >(keycode);
 		
 		if (!key) {
-			OBJ_STDWARN("Invalid key found: " << keycode);
-			warn_skipped_mapping();
+			NEMO_WARN("Invalid key {} in {}", keycode, _config_file);
+			warn_skipped_mapping(button_field, keycode);
 			continue;
 		}
 
@@ -92,12 +89,12 @@ Controller::Controller(const std::filesystem::path& file)
 	}
 
 	if (!isValidController()) {
-		OBJ_STDWARN("Incomplete mapping(s) in " << _config_file);
+		NEMO_WARN("{} has incomplete mapping(s)", _config_file);
 		useDefaultKeyMappings();
 		return;
 	}
 
-	OBJ_STDINFO("Used keyboard mapping config from " << _config_file);
+	NEMO_INFO("Used keyboard mapping from {}", _config_file);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +115,7 @@ Controller::~Controller()
 void
 Controller::useDefaultKeyMappings()
 {
-	OBJ_STDINFO("Used default keyboard mapping for controller");
+	NEMO_INFO("Used default keyboard mapping for controller");
 
 	changeKeyMapping(key_t::A,     Button::Left  );
 	changeKeyMapping(key_t::W,     Button::Up    );
@@ -129,7 +126,7 @@ Controller::useDefaultKeyMappings()
 	changeKeyMapping(key_t::Enter, Button::Select);
 
 	if (!isValidController()) {
-		STDERR("Default keyboard mapping needs to change");
+		NEMO_ERROR("Default keyboard mapping needs to change");
 	}
 }
 
@@ -149,7 +146,7 @@ Controller::registerKeyPress(const key_t key)
 
 	// Newly pressed key.
 	_pressed_keys.push_front(key);
-	STDDEBUG("Key " << key << " pressed");
+	NEMO_DEBUG("Key {} pressed", key);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -164,7 +161,7 @@ Controller::registerKeyRelease(const key_t key)
 	);
 
 	_pressed_keys.erase(keys_to_remove, _pressed_keys.end());
-	STDDEBUG("Key " << key << " released");
+	NEMO_DEBUG("Key {} released", key);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,8 +226,7 @@ const
 			continue;
 		}
 
-		const auto button_field = magic_enum::enum_name(button);
-		OBJ_STDDEBUG("Found [" << button_field << "] being pressed.");
+		NEMO_DEBUG("Found [{}] being pressed", magic_enum::enum_name(button));
 
 		return button;
 	}
@@ -265,7 +261,7 @@ const
 	std::ofstream config_ofs(file);
 
 	if (!config_ofs) {
-		OBJ_STDWARN("Failed to create " << file);
+		NEMO_WARN("Failed to create {}", file);
 		return false;
 	}
 
@@ -281,11 +277,11 @@ const
 	config_ofs << config.dump(4);
 
 	if (!config_ofs) {
-		OBJ_STDWARN("Write error in " << file);
+		NEMO_WARN("Write error in {}", file);
 		return false;
 	}
 
-	OBJ_STDINFO("Saved settings to " << file);
+	NEMO_INFO("Saved settings to {}", file);
 	return true;
 }
 
