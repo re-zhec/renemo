@@ -11,4 +11,5 @@
 # Folders #
 ###########
 build/
+log/
 asset/sprite/tileset
