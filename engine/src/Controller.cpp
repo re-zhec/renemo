@@ -227,7 +227,6 @@ const
 		}
 
 		NEMO_DEBUG("Found [{}] being pressed", magic_enum::enum_name(button));
-
 		return button;
 	}
 
